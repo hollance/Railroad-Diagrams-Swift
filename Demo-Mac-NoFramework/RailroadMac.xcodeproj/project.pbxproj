@@ -1,0 +1,268 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		7BE565421AD2FB4B006EB7C8 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE5653F1AD2FB4B006EB7C8 /* main.swift */; };
+		7BE565431AD2FB4B006EB7C8 /* NSGraphicsContext+Fix.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BE565411AD2FB4B006EB7C8 /* NSGraphicsContext+Fix.m */; };
+		7BE565471AD2FB60006EB7C8 /* Demo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE565451AD2FB60006EB7C8 /* Demo.swift */; };
+		7BE565481AD2FB60006EB7C8 /* Railroad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE565461AD2FB60006EB7C8 /* Railroad.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		7B7E29621AD2E468009EDA1B /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		7B7E29641AD2E468009EDA1B /* RailroadMac */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RailroadMac; sourceTree = BUILT_PRODUCTS_DIR; };
+		7BE5653E1AD2FB4B006EB7C8 /* Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
+		7BE5653F1AD2FB4B006EB7C8 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		7BE565401AD2FB4B006EB7C8 /* NSGraphicsContext+Fix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSGraphicsContext+Fix.h"; sourceTree = "<group>"; };
+		7BE565411AD2FB4B006EB7C8 /* NSGraphicsContext+Fix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSGraphicsContext+Fix.m"; sourceTree = "<group>"; };
+		7BE565451AD2FB60006EB7C8 /* Demo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Demo.swift; sourceTree = "<group>"; };
+		7BE565461AD2FB60006EB7C8 /* Railroad.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Railroad.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7B7E29611AD2E468009EDA1B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7B7E295B1AD2E468009EDA1B = {
+			isa = PBXGroup;
+			children = (
+				7BE5653D1AD2FB4B006EB7C8 /* RailroadMac */,
+				7BE565441AD2FB60006EB7C8 /* Railroad */,
+				7B7E29651AD2E468009EDA1B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7B7E29651AD2E468009EDA1B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7B7E29641AD2E468009EDA1B /* RailroadMac */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7BE5653D1AD2FB4B006EB7C8 /* RailroadMac */ = {
+			isa = PBXGroup;
+			children = (
+				7BE5653E1AD2FB4B006EB7C8 /* Bridging-Header.h */,
+				7BE5653F1AD2FB4B006EB7C8 /* main.swift */,
+				7BE565401AD2FB4B006EB7C8 /* NSGraphicsContext+Fix.h */,
+				7BE565411AD2FB4B006EB7C8 /* NSGraphicsContext+Fix.m */,
+			);
+			path = RailroadMac;
+			sourceTree = SOURCE_ROOT;
+		};
+		7BE565441AD2FB60006EB7C8 /* Railroad */ = {
+			isa = PBXGroup;
+			children = (
+				7BE565451AD2FB60006EB7C8 /* Demo.swift */,
+				7BE565461AD2FB60006EB7C8 /* Railroad.swift */,
+			);
+			name = Railroad;
+			path = ../Railroad;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		7B7E29631AD2E468009EDA1B /* RailroadMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7B7E296B1AD2E468009EDA1B /* Build configuration list for PBXNativeTarget "RailroadMac" */;
+			buildPhases = (
+				7B7E29601AD2E468009EDA1B /* Sources */,
+				7B7E29611AD2E468009EDA1B /* Frameworks */,
+				7B7E29621AD2E468009EDA1B /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RailroadMac;
+			productName = RailroadMac2;
+			productReference = 7B7E29641AD2E468009EDA1B /* RailroadMac */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7B7E295C1AD2E468009EDA1B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0620;
+				ORGANIZATIONNAME = Hollance;
+				TargetAttributes = {
+					7B7E29631AD2E468009EDA1B = {
+						CreatedOnToolsVersion = 6.2;
+					};
+				};
+			};
+			buildConfigurationList = 7B7E295F1AD2E468009EDA1B /* Build configuration list for PBXProject "RailroadMac" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 7B7E295B1AD2E468009EDA1B;
+			productRefGroup = 7B7E29651AD2E468009EDA1B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7B7E29631AD2E468009EDA1B /* RailroadMac */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7B7E29601AD2E468009EDA1B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7BE565421AD2FB4B006EB7C8 /* main.swift in Sources */,
+				7BE565431AD2FB4B006EB7C8 /* NSGraphicsContext+Fix.m in Sources */,
+				7BE565471AD2FB60006EB7C8 /* Demo.swift in Sources */,
+				7BE565481AD2FB60006EB7C8 /* Railroad.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		7B7E29691AD2E468009EDA1B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		7B7E296A1AD2E468009EDA1B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		7B7E296C1AD2E468009EDA1B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = RailroadMac;
+				SWIFT_OBJC_BRIDGING_HEADER = "RailroadMac/Bridging-Header.h";
+			};
+			name = Debug;
+		};
+		7B7E296D1AD2E468009EDA1B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = RailroadMac;
+				SWIFT_OBJC_BRIDGING_HEADER = "RailroadMac/Bridging-Header.h";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7B7E295F1AD2E468009EDA1B /* Build configuration list for PBXProject "RailroadMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7B7E29691AD2E468009EDA1B /* Debug */,
+				7B7E296A1AD2E468009EDA1B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7B7E296B1AD2E468009EDA1B /* Build configuration list for PBXNativeTarget "RailroadMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7B7E296C1AD2E468009EDA1B /* Debug */,
+				7B7E296D1AD2E468009EDA1B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7B7E295C1AD2E468009EDA1B /* Project object */;
+}
