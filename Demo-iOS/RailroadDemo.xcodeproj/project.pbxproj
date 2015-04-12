@@ -15,6 +15,7 @@
 		7B23FF7D1AD2B4EA00B9B6C5 /* Railroad.h in Headers */ = {isa = PBXBuildFile; fileRef = 7B23FF7C1AD2B4EA00B9B6C5 /* Railroad.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7B23FF8F1AD2B4EA00B9B6C5 /* Railroad.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B23FF781AD2B4EA00B9B6C5 /* Railroad.framework */; };
 		7B23FF901AD2B4EA00B9B6C5 /* Railroad.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7B23FF781AD2B4EA00B9B6C5 /* Railroad.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7B2AEC261ADA737C00934D94 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B2AEC251ADA737C00934D94 /* Util.swift */; };
 		7BE5653A1AD2FA48006EB7C8 /* Railroad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE565391AD2FA48006EB7C8 /* Railroad.swift */; };
 		7BE5653C1AD2FA6A006EB7C8 /* Demo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE5653B1AD2FA6A006EB7C8 /* Demo.swift */; };
 /* End PBXBuildFile section */
@@ -54,6 +55,7 @@
 		7B23FF781AD2B4EA00B9B6C5 /* Railroad.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Railroad.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B23FF7B1AD2B4EA00B9B6C5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B23FF7C1AD2B4EA00B9B6C5 /* Railroad.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Railroad.h; sourceTree = "<group>"; };
+		7B2AEC251ADA737C00934D94 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Util.swift; path = ../../Railroad/Util.swift; sourceTree = "<group>"; };
 		7BE565391AD2FA48006EB7C8 /* Railroad.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Railroad.swift; path = ../../Railroad/Railroad.swift; sourceTree = "<group>"; };
 		7BE5653B1AD2FA6A006EB7C8 /* Demo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Demo.swift; path = ../../Railroad/Demo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -100,6 +102,7 @@
 			children = (
 				7B23FF531AD2B46500B9B6C5 /* AppDelegate.swift */,
 				7BE5653B1AD2FA6A006EB7C8 /* Demo.swift */,
+				7B2AEC251ADA737C00934D94 /* Util.swift */,
 				7B23FF551AD2B46500B9B6C5 /* ViewController.swift */,
 				7B23FF571AD2B46500B9B6C5 /* Main.storyboard */,
 				7B23FF5A1AD2B46500B9B6C5 /* Images.xcassets */,
@@ -250,6 +253,7 @@
 				7B23FF561AD2B46500B9B6C5 /* ViewController.swift in Sources */,
 				7B23FF541AD2B46500B9B6C5 /* AppDelegate.swift in Sources */,
 				7BE5653C1AD2FA6A006EB7C8 /* Demo.swift in Sources */,
+				7B2AEC261ADA737C00934D94 /* Util.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

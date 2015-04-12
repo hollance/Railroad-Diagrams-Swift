@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		7B7E29231AD2CC4E009EDA1B /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E29221AD2CC4E009EDA1B /* main.swift */; };
 		7B7E293A1AD2D974009EDA1B /* Railroad.h in Headers */ = {isa = PBXBuildFile; fileRef = 7B7E29391AD2D974009EDA1B /* Railroad.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		7B7E29521AD2DA1A009EDA1B /* NSGraphicsContext+Fix.h in Headers */ = {isa = PBXBuildFile; fileRef = 7B7E29501AD2DA1A009EDA1B /* NSGraphicsContext+Fix.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		7B7E29531AD2DA1A009EDA1B /* NSGraphicsContext+Fix.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E29511AD2DA1A009EDA1B /* NSGraphicsContext+Fix.m */; };
 		7BE5654A1AD2FC1F006EB7C8 /* Railroad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE565491AD2FC1F006EB7C8 /* Railroad.swift */; };
 		7BE5654C1AD2FC27006EB7C8 /* Demo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE5654B1AD2FC27006EB7C8 /* Demo.swift */; };
 /* End PBXBuildFile section */
@@ -43,8 +41,6 @@
 		7B7E29351AD2D974009EDA1B /* Railroad.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Railroad.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B7E29381AD2D974009EDA1B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B7E29391AD2D974009EDA1B /* Railroad.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Railroad.h; sourceTree = "<group>"; };
-		7B7E29501AD2DA1A009EDA1B /* NSGraphicsContext+Fix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSGraphicsContext+Fix.h"; sourceTree = "<group>"; };
-		7B7E29511AD2DA1A009EDA1B /* NSGraphicsContext+Fix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSGraphicsContext+Fix.m"; sourceTree = "<group>"; };
 		7BE565491AD2FC1F006EB7C8 /* Railroad.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Railroad.swift; path = ../../Railroad/Railroad.swift; sourceTree = "<group>"; };
 		7BE5654B1AD2FC27006EB7C8 /* Demo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Demo.swift; path = ../../Railroad/Demo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -99,8 +95,6 @@
 			children = (
 				7BE565491AD2FC1F006EB7C8 /* Railroad.swift */,
 				7B7E29391AD2D974009EDA1B /* Railroad.h */,
-				7B7E29501AD2DA1A009EDA1B /* NSGraphicsContext+Fix.h */,
-				7B7E29511AD2DA1A009EDA1B /* NSGraphicsContext+Fix.m */,
 				7B7E29371AD2D974009EDA1B /* Supporting Files */,
 			);
 			path = Railroad;
@@ -121,7 +115,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7B7E29521AD2DA1A009EDA1B /* NSGraphicsContext+Fix.h in Headers */,
 				7B7E293A1AD2D974009EDA1B /* Railroad.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -224,7 +217,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7B7E29531AD2DA1A009EDA1B /* NSGraphicsContext+Fix.m in Sources */,
 				7BE5654A1AD2FC1F006EB7C8 /* Railroad.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

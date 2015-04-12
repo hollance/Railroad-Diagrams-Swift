@@ -271,25 +271,138 @@ extension DiagramStyle {
     return horizontalSpacing
   }
 
+  var oddLineAdjust: CGFloat {
+    return ceil(trackLineWidth) % 2 == 0 ? 0 : -0.5
+  }
+
+  // For drawing curves in a Parallel and Loop.
+  var radius: CGFloat {
+    return floor(horizontalSpacing / 2)
+  }
+
   func pathForArrowHead() -> CGPathRef {
     let x1 = CGFloat(0)
     let x2 = self.arrowSize
 
     let y1 = -self.arrowSize / 2
-    let y2 = CGFloat(-0.5)
-    let y3 = CGFloat(0.5)
-    let y4 = self.arrowSize / 2
+    let y2 = CGFloat(0)
+    let y3 = self.arrowSize / 2
 
     let path = CGPathCreateMutable()
     CGPathMoveToPoint(path, nil, x1, y1)
     CGPathAddLineToPoint(path, nil, x2, y2)
-    CGPathAddLineToPoint(path, nil, x2, y3)
-    CGPathAddLineToPoint(path, nil, x1, y4)
+    CGPathAddLineToPoint(path, nil, x1, y3)
     CGPathAddLineToPoint(path, nil, x1, y1)
     CGPathCloseSubpath(path)
     return path
   }
 }
+
+// MARK: - Drawing helper functions
+
+/* This allows us to use NSString drawing in our own CGContextRef. */
+func setUpNSStringDrawingContext(context: CGContextRef) {
+  #if os(iOS)
+    UIGraphicsPushContext(context)
+  #else
+    NSGraphicsContext.saveGraphicsState()
+    let nscg = NSGraphicsContext(CGContext: context, flipped: true)
+    NSGraphicsContext.setCurrentContext(nscg)
+  #endif
+}
+
+func tearDownNSStringDrawingContext() {
+  #if os(iOS)
+    UIGraphicsPopContext()
+  #else
+    NSGraphicsContext.restoreGraphicsState()
+  #endif
+}
+
+func fillRect(context: CGContextRef, var rect: CGRect, color: Color) {
+  CGContextSetFillColorWithColor(context, color.CGColor)
+  CGContextFillRect(context, rect)
+}
+
+func strokeRect(context: CGContextRef, rect: CGRect, borderSize: CGFloat, color: Color) {
+  CGContextSetLineWidth(context, borderSize)
+  CGContextSetStrokeColorWithColor(context, color.CGColor)
+  CGContextStrokeRect(context, CGRectInset(rect, borderSize / 2, borderSize / 2))
+}
+
+func drawChildElement(element: Element, context: CGContextRef, diagramStyle: DiagramStyle, direction: Direction) {
+  CGContextSaveGState(context)
+  CGContextTranslateCTM(context, element.x, element.y)
+  element.drawIntoContext(context, diagramStyle: diagramStyle, direction: direction)
+  CGContextRestoreGState(context)
+}
+
+func drawHorizontalTrack(context: CGContextRef, startX: CGFloat, endX: CGFloat, y: CGFloat, diagramStyle: DiagramStyle) {
+  let half = ceil(diagramStyle.trackLineWidth / 2)
+  let rect = CGRect(x: startX, y: y - half, width: endX - startX, height: diagramStyle.trackLineWidth)
+  CGContextSetFillColorWithColor(context, diagramStyle.trackColor.CGColor)
+  CGContextFillRect(context, rect)
+
+  /*
+  // Alternative way of drawing the line.
+  let half = diagramStyle.oddLineAdjust
+  CGContextSetStrokeColorWithColor(context, diagramStyle.trackColor.CGColor)
+  CGContextSetStrokeColorWithColor(context, Color.randomColor().CGColor)
+  CGContextSetLineWidth(context, diagramStyle.trackLineWidth)
+  CGContextMoveToPoint(context, startX + half, y - half)
+  CGContextAddLineToPoint(context, endX - half, y - half)
+  CGContextStrokePath(context)
+  */
+}
+
+func drawArrowHead(context: CGContextRef, x: CGFloat, y: CGFloat, diagramStyle: DiagramStyle, direction: Direction) {
+  let arrowHead = diagramStyle.pathForArrowHead()
+  CGContextSaveGState(context)
+  CGContextSetFillColorWithColor(context, diagramStyle.trackColor.CGColor)
+  CGContextTranslateCTM(context, x, y + diagramStyle.oddLineAdjust)
+  if direction == .Backward {
+    CGContextTranslateCTM(context, diagramStyle.arrowSize, 0)
+    CGContextScaleCTM(context, -1, 1)
+  }
+  CGContextAddPath(context, arrowHead)
+  CGContextFillPath(context)
+  CGContextRestoreGState(context)
+}
+
+/*
+func drawVerticalTrack(context: CGContextRef, x: CGFloat, startY: CGFloat, endY: CGFloat, diagramStyle: DiagramStyle) {
+  let halfLine = ceil(diagramStyle.trackLineWidth / 2)
+  let rect = CGRect(x: x - halfLine, y: startY, width: diagramStyle.trackLineWidth, height: endY - startY)
+  CGContextSetFillColorWithColor(context, diagramStyle.trackColor.CGColor)
+  CGContextFillRect(context, rect)
+}
+
+func drawArc(context: CGContextRef, var centerX: CGFloat, var centerY: CGFloat, radius: CGFloat, quadrant: Int, diagramStyle: DiagramStyle) {
+  centerX += diagramStyle.oddLineAdjust
+  centerY += diagramStyle.oddLineAdjust
+
+  switch quadrant {
+  case 0:
+    CGContextMoveToPoint(context, centerX, centerY - radius)
+    CGContextAddArc(context, centerX, centerY, radius, -π/2, 0, 0)
+  case 1:
+    CGContextMoveToPoint(context, centerX - radius, centerY)
+    CGContextAddArc(context, centerX, centerY, radius, -π, -π/2, 0)
+  case 2:
+    CGContextMoveToPoint(context, centerX, centerY + radius)
+    CGContextAddArc(context, centerX, centerY, radius, π/2, π, 0)
+  case 3:
+    CGContextMoveToPoint(context, centerX + radius, centerY)
+    CGContextAddArc(context, centerX, centerY, radius, 0, π/2, 0)
+  default:
+    fatalError("Invalid quadrant \(quadrant)")
+  }
+
+  CGContextSetStrokeColorWithColor(context, diagramStyle.trackColor.CGColor)
+  CGContextSetLineWidth(context, diagramStyle.trackLineWidth)
+  CGContextStrokePath(context)
+}
+*/
 
 // MARK: - Elements
 
@@ -367,6 +480,7 @@ public final class Box: Element {
   override func drawIntoContext(context: CGContextRef, diagramStyle: DiagramStyle, direction: Direction) {
     debugRect(context, 0, 0, width, height, 2)
 
+    // Adjust position or width based on the alignment settings.
     var boxX = diagramStyle.lefthandTrackLength
     switch diagramStyle.alignmentForDirection(direction) {
     case .Left:
@@ -379,56 +493,43 @@ public final class Box: Element {
       boxWidth = width - diagramStyle.lefthandTrackLength - diagramStyle.righthandTrackLength
     }
 
-    let halfLine = ceil(diagramStyle.trackLineWidth / 2)
-    let centerY = floor(height/2)
-    let lineY = centerY - halfLine
-    let lineH = diagramStyle.trackLineWidth
-
     // For boxes with pointy sides we want to draw the track going partially
     // under the box, which looks better (but only if not drawing arrowheads).
-    var fudge = CGFloat(0)
+    var under = CGFloat(0)
     switch style.shape {
     case .PointySides:
-      fudge = boxWidth/2
+      under = boxWidth/2
     default:
       break
     }
 
-    var lineX = CGFloat(0)
-    var lineW = boxX
+    // Draw the incoming track.
+    var lineX = boxX
     if diagramStyle.arrowHeads && direction == .Forward {
-      lineW -= diagramStyle.arrowSize
+      lineX -= diagramStyle.arrowSize
     } else {
-      lineW += fudge
+      lineX += under
     }
 
-    CGContextSetFillColorWithColor(context, diagramStyle.trackColor.CGColor)
-    CGContextFillRect(context, CGRect(x: lineX, y: lineY, width: lineW, height: lineH))
+    drawHorizontalTrack(context, 0, lineX, connectY, diagramStyle)
 
+    // Draw the outgoing track.
     lineX = boxX + boxWidth
     if diagramStyle.arrowHeads && direction == .Backward {
       lineX += diagramStyle.arrowSize
     } else {
-      lineX -= fudge
+      lineX -= under
     }
-    lineW = width - lineX
 
-    CGContextFillRect(context, CGRect(x: lineX, y: lineY, width: lineW, height: lineH))
+    drawHorizontalTrack(context, lineX, width, connectY, diagramStyle)
 
+    // Draw the arrow head.
     if diagramStyle.arrowHeads {
-      let arrowHead = diagramStyle.pathForArrowHead()
-      CGContextSaveGState(context)
-      if direction == .Backward {
-        CGContextTranslateCTM(context, boxX + boxWidth + diagramStyle.arrowSize, centerY)
-        CGContextScaleCTM(context, -1, 1)
-      } else {
-        CGContextTranslateCTM(context, boxX - diagramStyle.arrowSize, centerY)
-      }
-      CGContextAddPath(context, arrowHead)
-      CGContextFillPath(context)
-      CGContextRestoreGState(context)
+      let arrowX = (direction == .Backward) ? boxX + boxWidth : boxX - diagramStyle.arrowSize
+      drawArrowHead(context, arrowX, connectY, diagramStyle, direction)
     }
 
+    // Draw the box shape.
     if style.shape.hasPath() {
       CGContextSetFillColorWithColor(context, style.backgroundColor.CGColor)
       CGContextSetStrokeColorWithColor(context, style.borderColor.CGColor)
@@ -442,11 +543,14 @@ public final class Box: Element {
       CGContextDrawPath(context, kCGPathFillStroke)
     }
 
+    // Draw the text.
     var textRect = CGRect(
       x: boxX + floor((boxWidth - textSize.width) / 2),
       y: floor((height - textSize.height) / 2),
       width: textSize.width,
       height: textSize.height)
+
+    debugRect(context, textRect.origin.x, textRect.origin.y, textRect.size.width, textRect.size.height, 4)
 
     text.drawInRect(textRect, withAttributes: style.textStyle.attribs())
   }
@@ -527,10 +631,7 @@ public final class Series: Element {
     debugRect(context, 0, 0, width, height, 0)
 
     for element in elements {
-      CGContextSaveGState(context)
-      CGContextTranslateCTM(context, element.x, element.y)
-      element.drawIntoContext(context, diagramStyle: diagramStyle, direction: direction)
-      CGContextRestoreGState(context)
+      drawChildElement(element, context, diagramStyle, direction)
     }
   }
 }
@@ -569,9 +670,7 @@ public final class Parallel: Element {
       }
 
       width += diagramStyle.horizontalSpacing * 3
-
-      // No vertical space below last element
-      height -= diagramStyle.verticalSpacing
+      height -= diagramStyle.verticalSpacing  // no space below last element
 
       connectY += elements[indexOfCenterElement].connectY
     }
@@ -591,57 +690,49 @@ public final class Parallel: Element {
   override func drawIntoContext(context: CGContextRef, diagramStyle: DiagramStyle, direction: Direction) {
     debugRect(context, 0, 0, width, height, 1)
 
-    let radius = floor(diagramStyle.horizontalSpacing / 2)
-    let inset = floor(diagramStyle.horizontalSpacing / 2) // rename to margin!
+    let radius = diagramStyle.radius
+    let margin = radius
 
-    if elements.count >= 2 {
-      CGContextSetStrokeColorWithColor(context, diagramStyle.trackColor.CGColor)
+    CGContextSaveGState(context)
+    CGContextTranslateCTM(context, diagramStyle.oddLineAdjust, diagramStyle.oddLineAdjust)
 
-      if indexOfCenterElement > 0 {
-        let lineX = radius + inset
-        let lineW = diagramStyle.trackLineWidth
-        let lineY1 = connectY
-        let lineY2 = elements.first!.y + elements.first!.connectY + radius
+    CGContextSetStrokeColorWithColor(context, diagramStyle.trackColor.CGColor)
+    CGContextSetLineWidth(context, diagramStyle.trackLineWidth)
 
-        CGContextSetLineWidth(context, diagramStyle.trackLineWidth)
+    // Draw the vertical track going up from the center line.
+    if indexOfCenterElement > 0 {
+      let lineY = elements.first!.y + elements.first!.connectY + radius
 
-        CGContextMoveToPoint(context, inset, lineY1)
-        CGContextAddArc(context, inset, lineY1 - radius, radius, π/2, 0, 1)
-        CGContextAddLineToPoint(context, lineX, lineY2)
-        CGContextStrokePath(context)
+      CGContextMoveToPoint(context, margin, connectY)
+      CGContextAddArc(context, margin, connectY - radius, radius, π/2, 0, 1)
+      CGContextAddLineToPoint(context, radius + margin, lineY)
+      CGContextStrokePath(context)
 
-        CGContextMoveToPoint(context, width - inset, lineY1)
-        CGContextAddArc(context, width - inset, lineY1 - radius, radius, π/2, π, 0)
-        CGContextAddLineToPoint(context, width - radius - inset, lineY2)
-        CGContextStrokePath(context)
-      }
-
-      if indexOfCenterElement < elements.count - 1 {
-        let lineX = radius + inset
-        let lineY = connectY
-        let lineW = diagramStyle.trackLineWidth
-        let lineH = elements.last!.y + elements.last!.connectY - lineY - radius
-
-        CGContextSetLineWidth(context, diagramStyle.trackLineWidth)
-
-        CGContextMoveToPoint(context, inset, lineY)
-        CGContextAddArc(context, inset, lineY + radius, radius, -π/2, 0, 0)
-        CGContextAddLineToPoint(context, lineX, lineY + lineH)
-        CGContextStrokePath(context)
-
-        CGContextMoveToPoint(context, width - inset, lineY)
-        CGContextAddArc(context, width - inset, lineY + radius, radius, -π/2, -π, 1)
-        CGContextAddLineToPoint(context, width - radius - inset, lineY + lineH)
-        CGContextStrokePath(context)
-      }
+      CGContextMoveToPoint(context, width - margin, connectY)
+      CGContextAddArc(context, width - margin, connectY - radius, radius, π/2, π, 0)
+      CGContextAddLineToPoint(context, width - radius - margin, lineY)
+      CGContextStrokePath(context)
     }
 
-    for (index, element) in enumerate(elements) {
-      CGContextSaveGState(context)
-      CGContextTranslateCTM(context, element.x, element.y)
-      element.drawIntoContext(context, diagramStyle: diagramStyle, direction: direction)
-      CGContextRestoreGState(context)
+    // Draw the vertical track going down from the center line.
+    if indexOfCenterElement < elements.count - 1 {
+      let lineY = elements.last!.y + elements.last!.connectY - radius
 
+      CGContextSetLineWidth(context, diagramStyle.trackLineWidth)
+
+      CGContextMoveToPoint(context, margin, connectY)
+      CGContextAddArc(context, margin, connectY + radius, radius, -π/2, 0, 0)
+      CGContextAddLineToPoint(context, radius + margin, lineY)
+      CGContextStrokePath(context)
+
+      CGContextMoveToPoint(context, width - margin, connectY)
+      CGContextAddArc(context, width - margin, connectY + radius, radius, -π/2, -π, 1)
+      CGContextAddLineToPoint(context, width - radius - margin, lineY)
+      CGContextStrokePath(context)
+    }
+
+    // Draw the curly bits connecting the child elements to the vertical tracks.
+    for (index, element) in enumerate(elements) {
       let lineY = element.y + element.connectY
 
       if index < indexOfCenterElement {
@@ -652,14 +743,16 @@ public final class Parallel: Element {
         CGContextMoveToPoint(context, element.x + element.width, lineY)
         CGContextAddArc(context, element.x + element.width, lineY + radius, radius, -π/2, 0, 0)
         CGContextStrokePath(context)
+
       } else if index > indexOfCenterElement {
-        CGContextMoveToPoint(context, radius + inset, lineY - radius)
+        CGContextMoveToPoint(context, radius + margin, lineY - radius)
         CGContextAddArc(context, element.x, lineY - radius, radius, π, π/2, 1)
         CGContextStrokePath(context)
 
         CGContextMoveToPoint(context, element.x + element.width, lineY)
         CGContextAddArc(context, element.x + element.width, lineY - radius, radius, π/2, 0, 1)
         CGContextStrokePath(context)
+
       } else {
         CGContextMoveToPoint(context, 0, lineY)
         CGContextAddLineToPoint(context, element.x, lineY)
@@ -669,6 +762,13 @@ public final class Parallel: Element {
         CGContextAddLineToPoint(context, width, lineY)
         CGContextStrokePath(context)
       }
+    }
+
+    CGContextRestoreGState(context)
+
+    // Draw the child elements last so they go on top of everything.
+    for (index, element) in enumerate(elements) {
+      drawChildElement(element, context, diagramStyle, direction)
     }
   }
 }
@@ -715,32 +815,45 @@ public final class Loop: Element {
   override func drawIntoContext(context: CGContextRef, diagramStyle: DiagramStyle, direction: Direction) {
     debugRect(context, 0, 0, width, height, 3)
 
-    let radius = floor(diagramStyle.horizontalSpacing / 2)
+    let radius = diagramStyle.radius
     let lineY1 = forward.y + forward.connectY
     let lineY2 = backward.y + backward.connectY
+
+    drawHorizontalTrack(context, 0, forward.x, forward.y + forward.connectY, diagramStyle)
+    drawHorizontalTrack(context, forward.x + forward.width, width, forward.y + forward.connectY, diagramStyle)
+
+    /*
+    // Alternative way to draw it, but the arcs don't always align with the
+    // lines properly. So it's better to stroke it as a continuous path.
+    drawArc(context, forward.x, lineY1 + radius, radius, 1, diagramStyle)
+    drawVerticalTrack(context, radius, lineY1 + radius, lineY2 - radius, diagramStyle)
+    drawArc(context, forward.x, lineY2 - radius, radius, 2, diagramStyle)
+
+    drawArc(context, forward.x + forward.width, lineY1 + radius, radius, 0, diagramStyle)
+    drawVerticalTrack(context, width - radius, lineY1 + radius, lineY2 - radius, diagramStyle)
+    drawArc(context, forward.x + forward.width, lineY2 - radius, radius, 3, diagramStyle)
+    */
+
+    CGContextSaveGState(context)
+    CGContextTranslateCTM(context, diagramStyle.oddLineAdjust, diagramStyle.oddLineAdjust)
 
     CGContextSetStrokeColorWithColor(context, diagramStyle.trackColor.CGColor)
     CGContextSetLineWidth(context, diagramStyle.trackLineWidth)
 
-    CGContextMoveToPoint(context, 0, lineY1)
+    CGContextMoveToPoint(context, forward.x, lineY1)
     CGContextAddArc(context, forward.x, lineY1 + radius, radius, -π/2, -π, 1)
     CGContextAddArc(context, backward.x, lineY2 - radius, radius, π, π/2, 1)
     CGContextStrokePath(context)
 
-    CGContextMoveToPoint(context, width, lineY1)
-    CGContextAddArc(context, backward.x + backward.width, lineY1 + radius, radius, -π/2, 0, 0)
+    CGContextMoveToPoint(context, forward.x + forward.width, lineY1)
+    CGContextAddArc(context, forward.x + forward.width, lineY1 + radius, radius, -π/2, 0, 0)
     CGContextAddArc(context, backward.x + backward.width, lineY2 - radius, radius, 0, π/2, 0)
     CGContextStrokePath(context)
 
-    CGContextSaveGState(context)
-    CGContextTranslateCTM(context, forward.x, forward.y)
-    forward.drawIntoContext(context, diagramStyle: diagramStyle, direction: .Forward)
     CGContextRestoreGState(context)
 
-    CGContextSaveGState(context)
-    CGContextTranslateCTM(context, backward.x, backward.y)
-    backward.drawIntoContext(context, diagramStyle: diagramStyle, direction: .Backward)
-    CGContextRestoreGState(context)
+    drawChildElement(forward, context, diagramStyle, .Forward)
+    drawChildElement(backward, context, diagramStyle, .Backward)
   }
 }
 
@@ -757,25 +870,13 @@ public final class Skip: Element {
   }
 
   override func drawIntoContext(context: CGContextRef, diagramStyle: DiagramStyle, direction: Direction) {
-    CGContextSetFillColorWithColor(context, diagramStyle.trackColor.CGColor)
+    debugRect(context, 0, 0, width, height, 4)
 
-    let halfLine = ceil(diagramStyle.trackLineWidth / 2)
-    let centerY = floor(height/2)
-    let lineY = centerY - halfLine
-    let lineH = diagramStyle.trackLineWidth
-
-    CGContextFillRect(context, CGRect(x: 0, y: lineY, width: width, height: lineH))
+    let lineY = floor(height/2)
+    drawHorizontalTrack(context, 0, width, lineY, diagramStyle)
 
     if diagramStyle.arrowHeads {
-      let arrowHead = diagramStyle.pathForArrowHead()
-      CGContextSaveGState(context)
-      CGContextTranslateCTM(context, floor(width/2), centerY)
-      if direction == .Backward {
-        CGContextScaleCTM(context, -1, 1)
-      }
-      CGContextAddPath(context, arrowHead)
-      CGContextFillPath(context)
-      CGContextRestoreGState(context)
+      drawArrowHead(context, floor(width/2), lineY, diagramStyle, direction)
     }
   }
 }
@@ -826,24 +927,10 @@ public final class Decoration: Element {
   override func drawIntoContext(context: CGContextRef, diagramStyle: DiagramStyle, direction: Direction) {
     var rect = CGRectMake(style.margin.left, style.margin.top, width - style.margin.left - style.margin.right, height - style.margin.top - style.margin.bottom)
 
-    CGContextSetFillColorWithColor(context, style.backgroundColor.CGColor)
-    CGContextFillRect(context, rect)
+    fillRect(context, rect, style.backgroundColor)
+    strokeRect(context, rect, style.borderSize, style.borderColor)
 
-    CGContextSaveGState(context)
-    CGContextTranslateCTM(context, element.x, element.y)
-    element.drawIntoContext(context, diagramStyle: diagramStyle, direction: direction)
-    CGContextRestoreGState(context)
-
-    CGContextSetStrokeColorWithColor(context, style.borderColor.CGColor)
-
-    let halfBorder = style.borderSize / 2
-    rect.origin.x += halfBorder
-    rect.origin.y += halfBorder
-    rect.size.width -= style.borderSize
-    rect.size.height -= style.borderSize
-
-    CGContextSetLineWidth(context, style.borderSize)
-    CGContextStrokeRect(context, rect)
+    drawChildElement(element, context, diagramStyle, direction)
 
     if text != "" {
       var textRect = CGRect(
@@ -856,17 +943,8 @@ public final class Decoration: Element {
     }
 
     let lineY = element.y + element.connectY
-
-    CGContextSetStrokeColorWithColor(context, diagramStyle.trackColor.CGColor)
-    CGContextSetLineWidth(context, diagramStyle.trackLineWidth)
-
-    CGContextMoveToPoint(context, 0, lineY)
-    CGContextAddLineToPoint(context, element.x, lineY)
-    CGContextStrokePath(context)
-
-    CGContextMoveToPoint(context, element.x + element.width, lineY)
-    CGContextAddLineToPoint(context, width, lineY)
-    CGContextStrokePath(context)
+    drawHorizontalTrack(context, 0, element.x, lineY, diagramStyle)
+    drawHorizontalTrack(context, element.x + element.width, width, lineY, diagramStyle)
   }
 }
 
@@ -896,28 +974,23 @@ extension Diagram {
 
     var width = element.width + capSize*2 + style.horizontalSpacing*2 + style.margin.left + style.margin.right
     var height = element.height + style.margin.top + style.margin.bottom
+    assert(width > 0)
+    assert(height > 0)
 
     let context = createContextWithWidth(width, height: height, scale: scale)
 
-    // This allows us to use NSString drawing in our own CGContextRef.
-    #if os(iOS)
-    UIGraphicsPushContext(context)
-    #else
-    NSGraphicsContext.saveGraphicsState()
-    let nscg = NSGraphicsContext(fix: context)
-    //let nscg = NSGraphicsContext(CGContext: context, flipped: true)  //TODO on 10.10!
-    NSGraphicsContext.setCurrentContext(nscg)
-    #endif
+    setUpNSStringDrawingContext(context)
+    CGContextSetLineCap(context, kCGLineCapSquare)
 
-    CGContextSaveGState(context)
-    CGContextTranslateCTM(context, element.x, element.y)
-    element.drawIntoContext(context, diagramStyle: style, direction: .Forward)
-    CGContextRestoreGState(context)
+    drawChildElement(element, context, style, .Forward)
 
     let lineY = element.y + element.connectY
-    let capY = lineY - floor(capSize / 2)
+    let capY = lineY - ceil(capSize / 2)
     let capX1 = element.x - capSize - style.horizontalSpacing
     let capX2 = element.x + element.width + style.horizontalSpacing
+
+    drawHorizontalTrack(context, capX1 + capSize, element.x, lineY, style)
+    drawHorizontalTrack(context, element.x + element.width, capX2, lineY, style)
 
     CGContextSetFillColorWithColor(context, style.trackColor.CGColor)
     CGContextSetStrokeColorWithColor(context, style.trackColor.CGColor)
@@ -950,26 +1023,14 @@ extension Diagram {
       CGContextStrokePath(context)
     }
 
-    CGContextMoveToPoint(context, capX1 + capSize, lineY)
-    CGContextAddLineToPoint(context, element.x, lineY)
-    CGContextStrokePath(context)
-
-    CGContextMoveToPoint(context, element.x + element.width, lineY)
-    CGContextAddLineToPoint(context, capX2, lineY)
-    CGContextStrokePath(context)
-
-    #if os(iOS)
-    UIGraphicsPopContext()
-    #else
-    NSGraphicsContext.restoreGraphicsState()
-    #endif
+    tearDownNSStringDrawingContext()
 
     return imageFromContext(context, scale: scale)
   }
 
   private func createContextWithWidth(width: CGFloat, height: CGFloat, scale: CGFloat) -> CGContextRef {
-    let contextWidth = UInt(width * scale)
-    let contextHeight = UInt(height * scale)
+    let contextWidth = Int(width * scale)
+    let contextHeight = Int(height * scale)
 
     let colorSpace = CGColorSpaceCreateDeviceRGB()
     let bitmapInfo = CGBitmapInfo(CGImageAlphaInfo.PremultipliedLast.rawValue)

@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7B2AEC281ADA76B100934D94 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B2AEC271ADA76B100934D94 /* Util.swift */; };
 		7BE565421AD2FB4B006EB7C8 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE5653F1AD2FB4B006EB7C8 /* main.swift */; };
-		7BE565431AD2FB4B006EB7C8 /* NSGraphicsContext+Fix.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BE565411AD2FB4B006EB7C8 /* NSGraphicsContext+Fix.m */; };
 		7BE565471AD2FB60006EB7C8 /* Demo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE565451AD2FB60006EB7C8 /* Demo.swift */; };
 		7BE565481AD2FB60006EB7C8 /* Railroad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE565461AD2FB60006EB7C8 /* Railroad.swift */; };
 /* End PBXBuildFile section */
@@ -26,11 +26,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7B2AEC271ADA76B100934D94 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		7B7E29641AD2E468009EDA1B /* RailroadMac */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RailroadMac; sourceTree = BUILT_PRODUCTS_DIR; };
-		7BE5653E1AD2FB4B006EB7C8 /* Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
 		7BE5653F1AD2FB4B006EB7C8 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		7BE565401AD2FB4B006EB7C8 /* NSGraphicsContext+Fix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSGraphicsContext+Fix.h"; sourceTree = "<group>"; };
-		7BE565411AD2FB4B006EB7C8 /* NSGraphicsContext+Fix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSGraphicsContext+Fix.m"; sourceTree = "<group>"; };
 		7BE565451AD2FB60006EB7C8 /* Demo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Demo.swift; sourceTree = "<group>"; };
 		7BE565461AD2FB60006EB7C8 /* Railroad.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Railroad.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -66,10 +64,7 @@
 		7BE5653D1AD2FB4B006EB7C8 /* RailroadMac */ = {
 			isa = PBXGroup;
 			children = (
-				7BE5653E1AD2FB4B006EB7C8 /* Bridging-Header.h */,
 				7BE5653F1AD2FB4B006EB7C8 /* main.swift */,
-				7BE565401AD2FB4B006EB7C8 /* NSGraphicsContext+Fix.h */,
-				7BE565411AD2FB4B006EB7C8 /* NSGraphicsContext+Fix.m */,
 			);
 			path = RailroadMac;
 			sourceTree = SOURCE_ROOT;
@@ -79,6 +74,7 @@
 			children = (
 				7BE565451AD2FB60006EB7C8 /* Demo.swift */,
 				7BE565461AD2FB60006EB7C8 /* Railroad.swift */,
+				7B2AEC271ADA76B100934D94 /* Util.swift */,
 			);
 			name = Railroad;
 			path = ../Railroad;
@@ -141,9 +137,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				7BE565421AD2FB4B006EB7C8 /* main.swift in Sources */,
-				7BE565431AD2FB4B006EB7C8 /* NSGraphicsContext+Fix.m in Sources */,
 				7BE565471AD2FB60006EB7C8 /* Demo.swift in Sources */,
 				7BE565481AD2FB60006EB7C8 /* Railroad.swift in Sources */,
+				7B2AEC281ADA76B100934D94 /* Util.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -229,7 +225,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = RailroadMac;
-				SWIFT_OBJC_BRIDGING_HEADER = "RailroadMac/Bridging-Header.h";
 			};
 			name = Debug;
 		};
@@ -237,7 +232,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = RailroadMac;
-				SWIFT_OBJC_BRIDGING_HEADER = "RailroadMac/Bridging-Header.h";
 			};
 			name = Release;
 		};

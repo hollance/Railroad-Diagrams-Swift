@@ -1,39 +1,8 @@
+//import Railroad
 
-/* Export an image to a PNG file */
-#if os(iOS)
-import UIKit
-
-func savePNG(image: UIImage, filename: String) {
-  if let dirs = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .AllDomainsMask, true) as? [String] {
-    let path = dirs[0].stringByAppendingPathComponent(filename)
-    if !UIImagePNGRepresentation(image).writeToFile(path, atomically: true) {
-      println("Error saving image to: \(path)")
-    } else {
-      println("Image saved to: \(path)")
-    }
-  }
-}
-#else
-import AppKit
-
-func savePNG(image: NSImage, path: String) {
-  image.lockFocus()
-  let bitmapRep = NSBitmapImageRep(focusedViewRect: NSMakeRect(0, 0, image.size.width, image.size.height))
-  image.unlockFocus()
-
-  if let bitmapRep = bitmapRep {
-    if let data = bitmapRep.representationUsingType(.NSPNGFileType, properties: [:]) {
-      if data.writeToFile(path, atomically: true) {
-        println("Image saved to: \(path)")
-        return
-      }
-    }
-  }
-  println("Error saving image to: \(path)")
-}
+#if os(OSX)
+import Cocoa
 #endif
-
-import Railroad
 
 func test1() -> Image {
   var commentStyle = BoxStyle()
@@ -53,23 +22,27 @@ func test1() -> Image {
 
   var decorationStyle = DecorationStyle()
   decorationStyle.backgroundColor = Color(white: 1, alpha: 0.2)
+  decorationStyle.borderSize = 2
 
   var diagramStyle = DiagramStyle()
   diagramStyle.backgroundColor = Color(white: 0.0, alpha: 0.1)
   diagramStyle.margin = EdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+  diagramStyle.trackLineWidth = 1
+  diagramStyle.arrowSize = 9
 
   let box = Box(text: "Happy birthday", style: boxStyle)
   let comment = Box(text: "at least 3 times", style: commentStyle)
   let loop = Loop(forward: box, backward: comment)
   let decoration = Decoration(element: loop, text: "to you!", style: decorationStyle)
 
-  return Diagram(style: diagramStyle).renderImage(decoration, scale: 1)
+  return Diagram(style: diagramStyle).renderImage(decoration, scale: 2)
 }
 
 func test2() -> Image {
   var myDiagramStyle = DiagramStyle()
   myDiagramStyle.backgroundColor = Color(white: 0.0, alpha: 0.1)
   myDiagramStyle.margin = EdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+  myDiagramStyle.trackLineWidth = 3
 
   var myBoxStyle = BoxStyle()
   myBoxStyle.shape = .RoundedCorners(cornerRadius: 12)
@@ -119,7 +92,7 @@ func test2() -> Image {
   chain1.add(Box(text: "cde", style: myBoxStyle3))
 
   let diagram = Diagram(style: myDiagramStyle)
-  return diagram.renderImage(chain1, scale: 1)
+  return diagram.renderImage(chain1, scale: 2)
 }
 
 /* 
@@ -267,4 +240,83 @@ func json_number() -> Image {
         or(terminal("e"), terminal("E")),
         maybe(or(terminal("+"), terminal("-"))),
         many(terminal("digit")))))
+}
+
+/* Edge cases */
+
+func edge_case_empty_toplevel() -> Image {
+  // Note: a Series or Parallel with no items as the top-level will trigger an 
+  // assertion, because it results in a bitmap with 0 height. However, it will
+  // work OK if the DiagramStyle has a non-zero margin.
+
+  var diagramStyle = DiagramStyle()
+  diagramStyle.margin = EdgeInsets(top: 10, left: 1, bottom: 10, right: 1)
+
+  let series = Series()
+  return Diagram(style: diagramStyle).renderImage(series, scale: 1)
+}
+
+func edge_case_box_toplevel() -> Image {
+  let box = Box(text: "Box")
+  return Diagram().renderImage(box, scale: 1)
+}
+
+func edge_case_box_no_text() -> Image {
+  let box = Box(text: "")
+  return Diagram().renderImage(box, scale: 1)
+}
+
+func edge_case_series_one_element() -> Image {
+  let box = Box(text: "Box")
+  let series = Series(elements: [box])
+  return Diagram().renderImage(series, scale: 1)
+}
+
+func edge_case_empty_series_parallel() -> Image {
+  // It's OK to have empty Series and Parallel, just not at the top-level.
+  let box = Box(text: "Box")
+  let series = Series(elements: [box, Series(), Parallel()])
+  return Diagram().renderImage(series, scale: 1)
+}
+
+func edge_case_series_with_skip() -> Image {
+  let series = Series(elements: [Skip()])
+  return Diagram().renderImage(series, scale: 1)
+}
+
+func edge_case_parallel_one_item() -> Image {
+  let box = Box(text: "Box")
+  let parallel = Parallel(elements: [box])
+  return Diagram().renderImage(parallel, scale: 1)
+}
+
+func edge_case_parallel_with_skip() -> Image {
+  let parallel = Parallel(elements: [Skip()])
+  return Diagram().renderImage(parallel, scale: 1)
+}
+
+func edge_case_parallel_two_skips() -> Image {
+  let parallel = Parallel(elements: [Skip(), Skip()])
+  return Diagram().renderImage(parallel, scale: 1)
+}
+
+func edge_case_loop_two_skips() -> Image {
+  let loop = Loop(forward: Skip(), backward: Skip())
+  return Diagram().renderImage(loop, scale: 1)
+}
+
+func edge_case_series_with_one_element_inside_parallel1() -> Image {
+  let box1 = Box(text: "Box1 with long text")
+  let box2 = Box(text: "Box2")
+  let series = Series(elements: [box2])
+  let parallel = Parallel(elements: [box1, series])
+  return Diagram().renderImage(parallel, scale: 1)
+}
+
+func edge_case_series_with_one_element_inside_parallel2() -> Image {
+  let box1 = Box(text: "Box1 with long text")
+  let box2 = Box(text: "Box2")
+  let series = Series(elements: [box1])
+  let parallel = Parallel(elements: [series, box2])
+  return Diagram().renderImage(parallel, scale: 1)
 }
