@@ -427,8 +427,16 @@ public final class Box: Element {
     let textPadding = style.textStyle.padding
     textSize = text.sizeWithAttributes(style.textStyle.attribs())
     boxWidth = ceil(textSize.width) + textPadding.left + textPadding.right
-    width = boxWidth + diagramStyle.lefthandTrackLength + diagramStyle.righthandTrackLength
     height = ceil(textSize.height) + textPadding.top + textPadding.bottom
+
+    switch style.shape {
+    case .RoundedSides:
+      boxWidth = max(boxWidth, height)
+    default:
+      break
+    }
+
+    width = boxWidth + diagramStyle.lefthandTrackLength + diagramStyle.righthandTrackLength
     connectY = floor(height / 2)
   }
 
