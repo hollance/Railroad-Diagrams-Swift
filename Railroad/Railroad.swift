@@ -271,11 +271,12 @@ extension DiagramStyle {
     return horizontalSpacing
   }
 
+  /* This keeps lines with an odd width sharp. */
   var oddLineAdjust: CGFloat {
     return ceil(trackLineWidth) % 2 == 0 ? 0 : -0.5
   }
 
-  // For drawing curves in a Parallel and Loop.
+  /* For drawing curves in a Parallel and Loop. */
   var radius: CGFloat {
     return floor(horizontalSpacing / 2)
   }
@@ -342,17 +343,6 @@ func drawHorizontalTrack(context: CGContextRef, startX: CGFloat, endX: CGFloat, 
   let rect = CGRect(x: startX, y: y - half, width: endX - startX, height: diagramStyle.trackLineWidth)
   CGContextSetFillColorWithColor(context, diagramStyle.trackColor.CGColor)
   CGContextFillRect(context, rect)
-
-  /*
-  // Alternative way of drawing the line.
-  let half = diagramStyle.oddLineAdjust
-  CGContextSetStrokeColorWithColor(context, diagramStyle.trackColor.CGColor)
-  CGContextSetStrokeColorWithColor(context, Color.randomColor().CGColor)
-  CGContextSetLineWidth(context, diagramStyle.trackLineWidth)
-  CGContextMoveToPoint(context, startX + half, y - half)
-  CGContextAddLineToPoint(context, endX - half, y - half)
-  CGContextStrokePath(context)
-  */
 }
 
 func drawArrowHead(context: CGContextRef, x: CGFloat, y: CGFloat, diagramStyle: DiagramStyle, direction: Direction) {
@@ -368,41 +358,6 @@ func drawArrowHead(context: CGContextRef, x: CGFloat, y: CGFloat, diagramStyle: 
   CGContextFillPath(context)
   CGContextRestoreGState(context)
 }
-
-/*
-func drawVerticalTrack(context: CGContextRef, x: CGFloat, startY: CGFloat, endY: CGFloat, diagramStyle: DiagramStyle) {
-  let halfLine = ceil(diagramStyle.trackLineWidth / 2)
-  let rect = CGRect(x: x - halfLine, y: startY, width: diagramStyle.trackLineWidth, height: endY - startY)
-  CGContextSetFillColorWithColor(context, diagramStyle.trackColor.CGColor)
-  CGContextFillRect(context, rect)
-}
-
-func drawArc(context: CGContextRef, var centerX: CGFloat, var centerY: CGFloat, radius: CGFloat, quadrant: Int, diagramStyle: DiagramStyle) {
-  centerX += diagramStyle.oddLineAdjust
-  centerY += diagramStyle.oddLineAdjust
-
-  switch quadrant {
-  case 0:
-    CGContextMoveToPoint(context, centerX, centerY - radius)
-    CGContextAddArc(context, centerX, centerY, radius, -π/2, 0, 0)
-  case 1:
-    CGContextMoveToPoint(context, centerX - radius, centerY)
-    CGContextAddArc(context, centerX, centerY, radius, -π, -π/2, 0)
-  case 2:
-    CGContextMoveToPoint(context, centerX, centerY + radius)
-    CGContextAddArc(context, centerX, centerY, radius, π/2, π, 0)
-  case 3:
-    CGContextMoveToPoint(context, centerX + radius, centerY)
-    CGContextAddArc(context, centerX, centerY, radius, 0, π/2, 0)
-  default:
-    fatalError("Invalid quadrant \(quadrant)")
-  }
-
-  CGContextSetStrokeColorWithColor(context, diagramStyle.trackColor.CGColor)
-  CGContextSetLineWidth(context, diagramStyle.trackLineWidth)
-  CGContextStrokePath(context)
-}
-*/
 
 // MARK: - Elements
 
@@ -821,18 +776,6 @@ public final class Loop: Element {
 
     drawHorizontalTrack(context, 0, forward.x, forward.y + forward.connectY, diagramStyle)
     drawHorizontalTrack(context, forward.x + forward.width, width, forward.y + forward.connectY, diagramStyle)
-
-    /*
-    // Alternative way to draw it, but the arcs don't always align with the
-    // lines properly. So it's better to stroke it as a continuous path.
-    drawArc(context, forward.x, lineY1 + radius, radius, 1, diagramStyle)
-    drawVerticalTrack(context, radius, lineY1 + radius, lineY2 - radius, diagramStyle)
-    drawArc(context, forward.x, lineY2 - radius, radius, 2, diagramStyle)
-
-    drawArc(context, forward.x + forward.width, lineY1 + radius, radius, 0, diagramStyle)
-    drawVerticalTrack(context, width - radius, lineY1 + radius, lineY2 - radius, diagramStyle)
-    drawArc(context, forward.x + forward.width, lineY2 - radius, radius, 3, diagramStyle)
-    */
 
     CGContextSaveGState(context)
     CGContextTranslateCTM(context, diagramStyle.oddLineAdjust, diagramStyle.oddLineAdjust)
