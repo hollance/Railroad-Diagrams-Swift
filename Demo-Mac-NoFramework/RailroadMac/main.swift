@@ -5,6 +5,7 @@ savePNG(test3(), "test3.png")
 savePNG(test4(), "test4.png")
 savePNG(json_object(), "json_object.png")
 savePNG(json_number(), "json_number.png")
+savePNG(regexp1(), "regexp1.png")
 
 savePNG(edge_case_empty_toplevel(), "edge_case_empty_series.png")
 savePNG(edge_case_box_toplevel(), "edge_case_box_toplevel.png")

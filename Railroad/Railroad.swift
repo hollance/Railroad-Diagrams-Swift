@@ -1027,9 +1027,56 @@ public final class BoxFactory {
 
 /* This DSL is based on https://github.com/tabatkins/railroad-diagrams */
 
+private let textStyle: TextStyle = {
+  var textStyle = TextStyle()
+  textStyle.font = Font.systemFontOfSize(14)
+  textStyle.padding = EdgeInsets(top: 4, left: 6, bottom: 6, right: 4)
+  return textStyle
+}()
+
 private let terminalStyle: BoxStyle = {
   var style = BoxStyle()
   style.shape = .RoundedSides
+  style.textStyle = textStyle
+  return style
+}()
+
+private let nonTerminalStyle: BoxStyle = {
+  var style = BoxStyle()
+  style.shape = .Rectangle
+  style.textStyle = textStyle
+  return style
+}()
+
+private let commentStyle: BoxStyle = {
+  var style = BoxStyle()
+  style.shape = .None
+
+  #if os(iOS)
+  style.textStyle.font = UIFont.italicSystemFontOfSize(12)
+  #else
+  let systemFont = NSFont.systemFontOfSize(12)
+  style.textStyle.font = NSFontManager.sharedFontManager().convertFont(systemFont, toHaveTrait: .ItalicFontMask)
+  #endif
+
+  return style
+}()
+
+private let specialStyle: BoxStyle = {
+  var style = BoxStyle()
+  style.shape = .PointySides(angle: 30)
+  style.textStyle = textStyle
+  style.textStyle.padding.left = 10
+  style.textStyle.padding.right = 10
+  return style
+}()
+
+private let captureStyle: DecorationStyle = {
+  var style = DecorationStyle()
+  style.margin = EdgeInsets(top: 0, left: 2, bottom: 0, right: 2)
+  style.padding = EdgeInsets(top: 6, left: 2, bottom: 6, right: 2)
+  style.textStyle.font = Font.boldSystemFontOfSize(10)
+  style.textStyle.padding = EdgeInsets(top: 0, left: 0, bottom: 3, right: 5)
   return style
 }()
 
@@ -1038,34 +1085,29 @@ public func terminal(text: String) -> Element {
   return Box(text: text, style: terminalStyle)
 }
 
-private let nonTerminalStyle: BoxStyle = {
-  var style = BoxStyle()
-  style.shape = .Rectangle
-  return style
-}()
-
 /* A box with straight sides. */
 public func nonTerminal(text: String) -> Element {
   return Box(text: text, style: nonTerminalStyle)
 }
 
-private let commentStyle: BoxStyle = {
-  var style = BoxStyle()
-  style.shape = .None
-
-  #if os(iOS)
-  style.textStyle.font = UIFont.italicSystemFontOfSize(18)
-  #else
-  let systemFont = NSFont.systemFontOfSize(18)
-  style.textStyle.font = NSFontManager.sharedFontManager().convertFont(systemFont, toHaveTrait: .ItalicFontMask)
-  #endif
-
-  return style
-}()
-
 /* Text with no box around it; you use this inside repeats. */
 public func comment(text: String) -> Element {
   return Box(text: text, style: commentStyle)
+}
+
+/* For things like \s, \w, and so on. */
+public func characterClass(text: String) -> Element {
+  return nonTerminal(text)
+}
+
+/* For literal text strings inside the regexp. */
+public func literal(text: String) -> Element {
+  return terminal(text)
+}
+
+/* For start-of-line, etc. */
+public func special(text: String) -> Element {
+  return Box(text: text, style: specialStyle)
 }
 
 /* Concatenation of two or more elements. */
@@ -1079,7 +1121,7 @@ public func sequence(elements: Element...) -> Element {
  * The drawSkipBelow parameter determines whether the skip line is drawn above
  * or below the element; the element itself is always in the center line.
  */
-public func optional(element: Element, _ drawSkipBelow: Bool = true) -> Element {
+public func optional(element: Element, _ drawSkipBelow: Bool = false) -> Element {
   let p = Parallel()
   if drawSkipBelow {
     p.add(element)
@@ -1109,26 +1151,32 @@ public func choice(centerIndex: Int, elements: Element...) -> Element {
   return p
 }
 
+public func skip() -> Element {
+  return Skip()
+}
+
 /* + in the regex */
-public func oneOrMore(element: Element, _ repeat: Element = Skip()) -> Element {
+public func oneOrMore(element: Element, _ repeat: Element = skip()) -> Element {
   return Loop(forward: element, backward: repeat)
 }
 
 /* * in the regex */
-public func zeroOrMore(element: Element, _ repeat: Element = Skip(), _ drawSkipBelow: Bool = true) -> Element {
+public func zeroOrMore(element: Element, _ repeat: Element = skip(), _ drawSkipBelow: Bool = false) -> Element {
   return optional(oneOrMore(element, repeat), drawSkipBelow)
 }
 
 /* A capture group in the regex. */
 public func capture(element: Element, text: String) -> Element {
-  return Decoration(element: element, text: text)
+  return Decoration(element: element, text: text, style: captureStyle)
 }
 
 /* Draws a railroad diagram as a UIImage. */
 public func diagram(elements: Element...) -> Image {
   var diagramStyle = DiagramStyle()
   diagramStyle.backgroundColor = Color.clearColor()
-  diagramStyle.margin = EdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+  diagramStyle.trackLineWidth = 2
+  diagramStyle.horizontalSpacing = 12
+  diagramStyle.verticalSpacing = 9
 
   let diagram = Diagram(style: diagramStyle)
   let series = Series(elements: elements)

@@ -1,4 +1,4 @@
-import Railroad
+//import Railroad
 
 #if os(OSX)
 import Cocoa
@@ -240,6 +240,34 @@ func json_number() -> Image {
         or(terminal("e"), terminal("E")),
         maybe(or(terminal("+"), terminal("-"))),
         many(terminal("digit")))))
+}
+
+/*
+* Draws the regexp: ^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$
+*/
+func regexp1() -> Image {
+  func digit() -> Element {
+    return characterClass("digit")
+  }
+
+  return diagram(
+    special("Start of Line"),
+    optional(choice(literal("+"), literal("-")), false),
+    capture(
+      choice(
+        sequence(oneOrMore(digit()), optional(literal("."), false), zeroOrMore(digit())),
+        sequence(literal("."), oneOrMore(digit()))
+      ),
+      "Capture 1"),
+    optional(capture(
+      sequence(
+        choice(literal("e"), literal("E")),
+        optional(choice(literal("+"), literal("-"))),
+        oneOrMore(digit())
+      ),
+      "Capture 2"), false),
+    special("End of Line")
+  )
 }
 
 /* Edge cases */
