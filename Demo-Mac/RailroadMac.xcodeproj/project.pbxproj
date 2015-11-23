@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7B1BECBA1C039F9B00B245F8 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1BECB91C039F9B00B245F8 /* Util.swift */; };
 		7B7E29231AD2CC4E009EDA1B /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B7E29221AD2CC4E009EDA1B /* main.swift */; };
 		7B7E293A1AD2D974009EDA1B /* Railroad.h in Headers */ = {isa = PBXBuildFile; fileRef = 7B7E29391AD2D974009EDA1B /* Railroad.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7BE5654A1AD2FC1F006EB7C8 /* Railroad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE565491AD2FC1F006EB7C8 /* Railroad.swift */; };
@@ -36,6 +37,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7B1BECB91C039F9B00B245F8 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Util.swift; path = ../../Railroad/Util.swift; sourceTree = "<group>"; };
 		7B7E291F1AD2CC4E009EDA1B /* RailroadMac */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RailroadMac; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B7E29221AD2CC4E009EDA1B /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		7B7E29351AD2D974009EDA1B /* Railroad.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Railroad.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -84,8 +86,9 @@
 		7B7E29211AD2CC4E009EDA1B /* RailroadMac */ = {
 			isa = PBXGroup;
 			children = (
-				7B7E29221AD2CC4E009EDA1B /* main.swift */,
 				7BE5654B1AD2FC27006EB7C8 /* Demo.swift */,
+				7B7E29221AD2CC4E009EDA1B /* main.swift */,
+				7B1BECB91C039F9B00B245F8 /* Util.swift */,
 			);
 			path = RailroadMac;
 			sourceTree = "<group>";
@@ -164,7 +167,8 @@
 		7B7E29171AD2CC4E009EDA1B /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0620;
+				LastSwiftUpdateCheck = 0710;
+				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = Hollance;
 				TargetAttributes = {
 					7B7E291E1AD2CC4E009EDA1B = {
@@ -209,6 +213,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7BE5654C1AD2FC27006EB7C8 /* Demo.swift in Sources */,
+				7B1BECBA1C039F9B00B245F8 /* Util.swift in Sources */,
 				7B7E29231AD2CC4E009EDA1B /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -251,6 +256,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -265,7 +271,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -301,7 +307,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};
@@ -347,6 +353,7 @@
 				INFOPLIST_FILE = Railroad/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.hollance.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -370,6 +377,7 @@
 				INFOPLIST_FILE = Railroad/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.hollance.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				VERSIONING_SYSTEM = "apple-generic";

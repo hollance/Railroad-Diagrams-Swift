@@ -3,21 +3,22 @@
 #if os(iOS)
 import UIKit
 
-func savePNG(image: UIImage, filename: String) {
-  if let dirs = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .AllDomainsMask, true) as? [String] {
-    let path = dirs[0].stringByAppendingPathComponent(filename)
-    if !UIImagePNGRepresentation(image).writeToFile(path, atomically: true) {
-      println("Error saving image to: \(path)")
+func savePNG(image: UIImage, _ filename: String) {
+  let dirs = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .AllDomainsMask, true)
+  let path = (dirs[0] as NSString).stringByAppendingPathComponent(filename)
+  if let data = UIImagePNGRepresentation(image) {
+    if !data.writeToFile(path, atomically: true) {
+      print("Error saving image to: \(path)")
     } else {
-      println("Image saved to: \(path)")
+      print("Image saved to: \(path)")
     }
   }
 }
 #else
 import AppKit
 
-func savePNG(image: NSImage, filename: String) {
-  let path = NSTemporaryDirectory().stringByAppendingPathComponent(filename)
+func savePNG(image: NSImage, _ filename: String) {
+  let path = (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent(filename)
 
   image.lockFocus()
   let bitmapRep = NSBitmapImageRep(focusedViewRect: NSMakeRect(0, 0, image.size.width, image.size.height))
@@ -26,11 +27,11 @@ func savePNG(image: NSImage, filename: String) {
   if let bitmapRep = bitmapRep {
     if let data = bitmapRep.representationUsingType(.NSPNGFileType, properties: [:]) {
       if data.writeToFile(path, atomically: true) {
-        println("Image saved to: \(path)")
+        print("Image saved to: \(path)")
         return
       }
     }
   }
-  println("Error saving image to: \(path)")
+  print("Error saving image to: \(path)")
 }
 #endif
