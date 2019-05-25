@@ -6,19 +6,19 @@ import Cocoa
 
 func test1() -> Image {
   var commentStyle = BoxStyle()
-  commentStyle.shape = .None
+  commentStyle.shape = .none
 
   #if os(iOS)
-  commentStyle.textStyle.font = Font.italicSystemFontOfSize(18)
+  commentStyle.textStyle.font = Font.italicSystemFont(ofSize: 18)
   #else
-  commentStyle.textStyle.font = NSFontManager.sharedFontManager().fontWithFamily("Verdana", traits: .ItalicFontMask, weight: 0, size: 18)!
+  commentStyle.textStyle.font = NSFontManager.shared.font(withFamily: "Verdana", traits: .italicFontMask, weight: 0, size: 18)!
   #endif
 
   var boxStyle = BoxStyle()
-  boxStyle.shape = .RoundedSides
-  boxStyle.textStyle.color = Color.darkGrayColor()
-  boxStyle.borderColor = Color.grayColor()
-  boxStyle.textStyle.font = Font.systemFontOfSize(24)
+  boxStyle.shape = .roundedSides
+  boxStyle.textStyle.color = Color.darkGray
+  boxStyle.borderColor = Color.gray
+  boxStyle.textStyle.font = Font.systemFont(ofSize: 24)
 
   var decorationStyle = DecorationStyle()
   decorationStyle.backgroundColor = Color(white: 1, alpha: 0.2)
@@ -35,7 +35,7 @@ func test1() -> Image {
   let loop = Loop(forward: box, backward: comment)
   let decoration = Decoration(element: loop, text: "to you!", style: decorationStyle)
 
-  return Diagram(style: diagramStyle).renderImage(decoration, scale: 2)
+  return Diagram(style: diagramStyle).renderImage(element: decoration, scale: 2)
 }
 
 func test2() -> Image {
@@ -45,20 +45,20 @@ func test2() -> Image {
   myDiagramStyle.trackLineWidth = 3
 
   var myBoxStyle = BoxStyle()
-  myBoxStyle.shape = .RoundedCorners(cornerRadius: 12)
+  myBoxStyle.shape = .roundedCorners(cornerRadius: 12)
   myBoxStyle.borderSize = 1
-  myBoxStyle.backgroundColor = Color.yellowColor()
-  myBoxStyle.borderColor = Color.redColor()
+  myBoxStyle.backgroundColor = Color.yellow
+  myBoxStyle.borderColor = Color.red
 
   var myBoxStyle2 = BoxStyle()
-  myBoxStyle2.shape = .PointySides(angle: 30)
-  myBoxStyle2.textStyle.color = Color.darkGrayColor()
-  myBoxStyle2.borderColor = Color.grayColor()
+  myBoxStyle2.shape = .pointySides(angle: 30)
+  myBoxStyle2.textStyle.color = Color.darkGray
+  myBoxStyle2.borderColor = Color.gray
 
   var myBoxStyle3 = BoxStyle()
-  myBoxStyle3.shape = .RoundedSides
-  myBoxStyle3.textStyle.color = Color.darkGrayColor()
-  myBoxStyle3.borderColor = Color.grayColor()
+  myBoxStyle3.shape = .roundedSides
+  myBoxStyle3.textStyle.color = Color.darkGray
+  myBoxStyle3.borderColor = Color.gray
   //myBoxStyle3.textInsets = EdgeInsets(top: 50, left: 10, bottom: 50, right: 10)
 
   let group1 = Parallel()
@@ -92,7 +92,7 @@ func test2() -> Image {
   chain1.add(Box(text: "cde", style: myBoxStyle3))
 
   let diagram = Diagram(style: myDiagramStyle)
-  return diagram.renderImage(chain1, scale: 2)
+  return diagram.renderImage(element: chain1, scale: 2)
 }
 
 /* 
@@ -101,10 +101,10 @@ func test2() -> Image {
  */
 func test3() -> Image {
   let strokeColor = Color(red: 0.10, green: 0.41, blue: 1.0, alpha: 1.0)
-  let fillColor = strokeColor.colorWithAlphaComponent(0.15)
+  let fillColor = strokeColor.withAlphaComponent(0.15)
 
   var boxStyle = BoxStyle()
-  boxStyle.shape = .RoundedSides
+  boxStyle.shape = .roundedSides
   boxStyle.borderColor = strokeColor
   boxStyle.backgroundColor = fillColor
   boxStyle.textStyle.color = Color(red: 0.05, green: 0.2, blue: 0.5, alpha: 1.0)
@@ -184,7 +184,7 @@ func test3() -> Image {
   diagramStyle.trackColor = strokeColor
 
   let diagram = Diagram(style: diagramStyle)
-  return diagram.renderImage(chain1, scale: 1)
+  return diagram.renderImage(element: chain1, scale: 1)
 }
 
 /*
@@ -203,7 +203,7 @@ func test4() -> Image {
           nonTerminal("name char"),
           nonTerminal("escape")
         ),
-        comment("yay"),
+        comment("a comment"),
         false
       ),
       "capture 2"
@@ -281,56 +281,56 @@ func edge_case_empty_toplevel() -> Image {
   diagramStyle.margin = EdgeInsets(top: 10, left: 1, bottom: 10, right: 1)
 
   let series = Series()
-  return Diagram(style: diagramStyle).renderImage(series, scale: 1)
+  return Diagram(style: diagramStyle).renderImage(element: series, scale: 1)
 }
 
 func edge_case_box_toplevel() -> Image {
   let box = Box(text: "Box")
-  return Diagram().renderImage(box, scale: 1)
+  return Diagram().renderImage(element: box, scale: 1)
 }
 
 func edge_case_box_no_text() -> Image {
   let box = Box(text: "")
-  return Diagram().renderImage(box, scale: 1)
+  return Diagram().renderImage(element: box, scale: 1)
 }
 
 func edge_case_series_one_element() -> Image {
   let box = Box(text: "Box")
   let series = Series(elements: [box])
-  return Diagram().renderImage(series, scale: 1)
+  return Diagram().renderImage(element: series, scale: 1)
 }
 
 func edge_case_empty_series_parallel() -> Image {
   // It's OK to have empty Series and Parallel, just not at the top-level.
   let box = Box(text: "Box")
   let series = Series(elements: [box, Series(), Parallel()])
-  return Diagram().renderImage(series, scale: 1)
+  return Diagram().renderImage(element: series, scale: 1)
 }
 
 func edge_case_series_with_skip() -> Image {
   let series = Series(elements: [Skip()])
-  return Diagram().renderImage(series, scale: 1)
+  return Diagram().renderImage(element: series, scale: 1)
 }
 
 func edge_case_parallel_one_item() -> Image {
   let box = Box(text: "Box")
   let parallel = Parallel(elements: [box])
-  return Diagram().renderImage(parallel, scale: 1)
+  return Diagram().renderImage(element: parallel, scale: 1)
 }
 
 func edge_case_parallel_with_skip() -> Image {
   let parallel = Parallel(elements: [Skip()])
-  return Diagram().renderImage(parallel, scale: 1)
+  return Diagram().renderImage(element: parallel, scale: 1)
 }
 
 func edge_case_parallel_two_skips() -> Image {
   let parallel = Parallel(elements: [Skip(), Skip()])
-  return Diagram().renderImage(parallel, scale: 1)
+  return Diagram().renderImage(element: parallel, scale: 1)
 }
 
 func edge_case_loop_two_skips() -> Image {
   let loop = Loop(forward: Skip(), backward: Skip())
-  return Diagram().renderImage(loop, scale: 1)
+  return Diagram().renderImage(element: loop, scale: 1)
 }
 
 func edge_case_series_with_one_element_inside_parallel1() -> Image {
@@ -338,7 +338,7 @@ func edge_case_series_with_one_element_inside_parallel1() -> Image {
   let box2 = Box(text: "Box2")
   let series = Series(elements: [box2])
   let parallel = Parallel(elements: [box1, series])
-  return Diagram().renderImage(parallel, scale: 1)
+  return Diagram().renderImage(element: parallel, scale: 1)
 }
 
 func edge_case_series_with_one_element_inside_parallel2() -> Image {
@@ -346,5 +346,5 @@ func edge_case_series_with_one_element_inside_parallel2() -> Image {
   let box2 = Box(text: "Box2")
   let series = Series(elements: [box1])
   let parallel = Parallel(elements: [series, box2])
-  return Diagram().renderImage(parallel, scale: 1)
+  return Diagram().renderImage(element: parallel, scale: 1)
 }

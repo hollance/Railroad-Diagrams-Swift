@@ -1,4 +1,3 @@
-
 import CoreGraphics
 
 /* For supporting both iOS and OS X. */
@@ -32,57 +31,58 @@ private extension Color {
 private let debugDraw = false
 
 private let debugColors = [
-  Color.blueColor(),
-  Color.redColor(),
-  Color.yellowColor(),
-  Color.greenColor(),
-  Color.purpleColor() ]
+  Color.blue,
+  Color.red,
+  Color.yellow,
+  Color.green,
+  Color.purple
+]
 
-private func debugRect(context: CGContextRef, _ x: CGFloat, _ y: CGFloat, _ width: CGFloat, _ height: CGFloat, _ type: Int) {
+private func debugRect(_ context: CGContext, _ x: CGFloat, _ y: CGFloat, _ width: CGFloat, _ height: CGFloat, _ type: Int) {
   if debugDraw {
-    CGContextSaveGState(context)
-    CGContextSetLineWidth(context, 1)
-    CGContextSetStrokeColorWithColor(context, debugColors[type].CGColor)
-    CGContextStrokeRect(context, CGRectMake(x + 0.5, y + 0.5, width - 1, height - 1))
-    CGContextRestoreGState(context)
+    context.saveGState()
+    context.setLineWidth(1)
+    context.setStrokeColor(debugColors[type].cgColor)
+    context.stroke(CGRect(x: x + 0.5, y: y + 0.5, width: width - 1, height: height - 1))
+    context.restoreGState()
   }
 }
 
 /* Helper code for doing trig. */
 
-private let π = CGFloat(M_PI)
+private let π = CGFloat.pi
 
-private func degreesToRadians(degrees: CGFloat) -> CGFloat {
+private func degreesToRadians(_ degrees: CGFloat) -> CGFloat {
   return π * degrees / 180.0
 }
 
-private func radiansToDegrees(radians: CGFloat) -> CGFloat {
+private func radiansToDegrees(_ radians: CGFloat) -> CGFloat {
   return radians * 180.0 / π
 }
 
 // MARK: Styling of the elements
 
 public enum BoxShape {
-  case None                                  // useful for comments
-  case Rectangle
-  case RoundedSides
-  case RoundedCorners(cornerRadius: CGFloat)
-  case PointySides(angle: CGFloat)           // larger angle = more pointy
+  case none                                  // useful for comments
+  case rectangle
+  case roundedSides
+  case roundedCorners(cornerRadius: CGFloat)
+  case pointySides(angle: CGFloat)           // larger angle = more pointy
 }
 
 public struct TextStyle {
-  public var font = Font.systemFontOfSize(18)
-  public var color = Color.blackColor()
+  public var font = Font.systemFont(ofSize: 18)
+  public var color = Color.black
   public var padding = EdgeInsets(top: 6, left: 18, bottom: 6, right: 18)
 
   public init() { }
 }
 
 public struct BoxStyle {
-  public var shape = BoxShape.Rectangle
+  public var shape = BoxShape.rectangle
   public var borderSize: CGFloat = 1
-  public var borderColor = Color.blackColor()
-  public var backgroundColor = Color.whiteColor()
+  public var borderColor = Color.black
+  public var backgroundColor = Color.white
   public var textStyle = TextStyle()
 
   public init() { }
@@ -93,11 +93,11 @@ public struct DecorationStyle {
   public var padding = EdgeInsets(top: 18, left: 12, bottom: 30, right: 12)
   public var borderSize: CGFloat = 3
   public var borderColor = Color(white: 0, alpha: 0.35)
-  public var backgroundColor = Color.clearColor()
+  public var backgroundColor = Color.clear
 
   public var textStyle: TextStyle = {
     var style = TextStyle()
-    style.font = Font.boldSystemFontOfSize(12)
+    style.font = Font.boldSystemFont(ofSize: 12)
     style.color = Color(white: 0, alpha: 0.35)
     style.padding = EdgeInsets(top: 0, left: 0, bottom: 6, right: 9)
     return style
@@ -107,27 +107,27 @@ public struct DecorationStyle {
 }
 
 public enum Alignment {
-  case Left
-  case Center
-  case Right
-  case Fill
+  case left
+  case center
+  case right
+  case fill
 }
 
 public enum CapStyle {
-  case FilledCircle
-  case StrokedCircle
-  case VerticalBars
+  case filledCircle
+  case strokedCircle
+  case verticalBars
 }
 
 public struct DiagramStyle {
   public var margin = EdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-  public var backgroundColor = Color.whiteColor()
-  public var capStyle = CapStyle.FilledCircle
+  public var backgroundColor = Color.white
+  public var capStyle = CapStyle.filledCircle
 
-  public var trackColor = Color.blackColor()
+  public var trackColor = Color.black
   public var trackLineWidth: CGFloat = 2
 
-  /* Tip: The arrow size should be odd/even is trackLineWidth is odd/even. */
+  /* Tip: The arrow size should be odd/even if trackLineWidth is odd/even. */
   public var arrowHeads = true
   public var arrowSize: CGFloat = 10
 
@@ -138,10 +138,10 @@ public struct DiagramStyle {
   public var verticalSpacing: CGFloat = 24
 
   /* What happens to the elements in a Parallel grouping. */
-  public var forwardAlignment = Alignment.Left
+  public var forwardAlignment = Alignment.left
 
   /* What happens to the elements in a Loop grouping. */
-  public var backwardAlignment = Alignment.Center
+  public var backwardAlignment = Alignment.center
 
   public init() { }
 }
@@ -149,44 +149,44 @@ public struct DiagramStyle {
 // MARK: - Styling helper methods
 
 extension BoxShape {
-  private func pathForRectangle(rect: CGRect) -> CGPathRef {
-    let path = CGPathCreateMutable()
-    CGPathAddRect(path, nil, rect)
+  private func pathForRectangle(rect: CGRect) -> CGPath {
+    let path = CGMutablePath()
+    path.addRect(rect)
     return path
   }
 
-  private func pathForRoundedCorners(rect: CGRect, cornerRadius: CGFloat) -> CGPathRef {
+  private func pathForRoundedCorners(rect: CGRect, cornerRadius: CGFloat) -> CGPath {
     let x1 = rect.origin.x
     let y1 = rect.origin.y
     let x2 = x1 + rect.size.width
     let y2 = y1 + rect.size.height
 
-    let path = CGPathCreateMutable()
-    CGPathMoveToPoint(path, nil, x1, y2 - cornerRadius)
-    CGPathAddArcToPoint(path, nil, x1, y1, x2, y1, cornerRadius)
-    CGPathAddArcToPoint(path, nil, x2, y1, x2, y2, cornerRadius)
-    CGPathAddArcToPoint(path, nil, x2, y2, x1, y2, cornerRadius)
-    CGPathAddArcToPoint(path, nil, x1, y2, x1, y1, cornerRadius)
-    CGPathCloseSubpath(path)
+    let path = CGMutablePath()
+    path.move(to: CGPoint(x: x1, y: y2 - cornerRadius))
+    path.addArc(tangent1End: CGPoint(x: x1, y: y1), tangent2End: CGPoint(x: x2, y: y1), radius: cornerRadius)
+    path.addArc(tangent1End: CGPoint(x: x2, y: y1), tangent2End: CGPoint(x: x2, y: y2), radius: cornerRadius)
+    path.addArc(tangent1End: CGPoint(x: x2, y: y2), tangent2End: CGPoint(x: x1, y: y2), radius: cornerRadius)
+    path.addArc(tangent1End: CGPoint(x: x1, y: y2), tangent2End: CGPoint(x: x1, y: y1), radius: cornerRadius)
+    path.closeSubpath()
     return path
   }
 
-  private func pathForRoundedSides(rect: CGRect) -> CGPathRef {
+  private func pathForRoundedSides(rect: CGRect) -> CGPath {
     let radius = rect.size.height/2
     let x1 = rect.origin.x + radius
     let y1 = rect.origin.y
     let x2 = rect.origin.x + rect.size.width - radius
-    let y2 = CGRectGetMidY(rect)
+    let y2 = rect.midY
 
-    let path = CGPathCreateMutable()
-    CGPathMoveToPoint(path, nil, x1, y1)
-    CGPathAddArc(path, nil, x2, y2, radius, -π/2, π/2, false)
-    CGPathAddArc(path, nil, x1, y2, radius, π/2, -π/2, false)
-    CGPathCloseSubpath(path)
+    let path = CGMutablePath()
+    path.move(to: CGPoint(x: x1, y: y1))
+    path.addArc(center: CGPoint(x: x2, y: y2), radius: radius, startAngle: -π/2, endAngle: π/2, clockwise: false)
+    path.addArc(center: CGPoint(x: x1, y: y2), radius: radius, startAngle: π/2, endAngle: -π/2, clockwise: false)
+    path.closeSubpath()
     return path
   }
 
-  private func pathForPointySides(rect: CGRect, angle: CGFloat) -> CGPathRef {
+  private func pathForPointySides(rect: CGRect, angle: CGFloat) -> CGPath {
     let inset = sin(degreesToRadians(angle)) * rect.size.height/2
 
     let x1 = rect.origin.x
@@ -195,43 +195,43 @@ extension BoxShape {
     let x3 = x4 - inset
 
     let y1 = rect.origin.y
-    let y2 = CGRectGetMidY(rect)
+    let y2 = rect.midY
     let y3 = y1 + rect.size.height
 
-    let path = CGPathCreateMutable()
-    CGPathMoveToPoint(path, nil, x2, y1)
-    CGPathAddLineToPoint(path, nil, x3, y1)
-    CGPathAddLineToPoint(path, nil, x4, y2)
-    CGPathAddLineToPoint(path, nil, x3, y3)
-    CGPathAddLineToPoint(path, nil, x2, y3)
-    CGPathAddLineToPoint(path, nil, x1, y2)
-    CGPathAddLineToPoint(path, nil, x2, y1)
-    CGPathCloseSubpath(path)
+    let path = CGMutablePath()
+    path.move(to: CGPoint(x: x2, y: y1))
+    path.addLine(to: CGPoint(x: x3, y: y1))
+    path.addLine(to: CGPoint(x: x4, y: y2))
+    path.addLine(to: CGPoint(x: x3, y: y3))
+    path.addLine(to: CGPoint(x: x2, y: y3))
+    path.addLine(to: CGPoint(x: x1, y: y2))
+    path.addLine(to: CGPoint(x: x2, y: y1))
+    path.closeSubpath()
     return path
   }
 
-  func pathForRect(rect: CGRect) -> CGPathRef {
+  func pathForRect(rect: CGRect) -> CGPath {
     switch self {
-    case .None:
+    case .none:
       fatalError("BoxShape.None has no path")
 
-    case .Rectangle:
-      return pathForRectangle(rect)
+    case .rectangle:
+      return pathForRectangle(rect: rect)
 
-    case .RoundedSides:
-      return pathForRoundedSides(rect)
+    case .roundedSides:
+      return pathForRoundedSides(rect: rect)
 
-    case .RoundedCorners(let cornerRadius):
-      return pathForRoundedCorners(rect, cornerRadius: cornerRadius)
+    case .roundedCorners(let cornerRadius):
+      return pathForRoundedCorners(rect: rect, cornerRadius: cornerRadius)
 
-    case .PointySides(let angle):
-      return pathForPointySides(rect, angle: angle)
+    case .pointySides(let angle):
+      return pathForPointySides(rect: rect, angle: angle)
     }
   }
 
   func hasPath() -> Bool {
     switch self {
-    case .None:
+    case .none:
       return false
     default:
       return true
@@ -240,19 +240,19 @@ extension BoxShape {
 }
 
 extension TextStyle {
-  func attribs() -> [String: AnyObject] {
+  func attribs() -> [NSAttributedString.Key: AnyObject] {
     let paragraphStyle = NSMutableParagraphStyle()      // for multiline text
-    paragraphStyle.alignment = NSTextAlignment.Center
+    paragraphStyle.alignment = NSTextAlignment.center
 
-    return [ NSFontAttributeName: font,
-      NSForegroundColorAttributeName: color,
-      NSParagraphStyleAttributeName: paragraphStyle ]
+    return [ NSAttributedString.Key.font: font,
+             NSAttributedString.Key.foregroundColor: color,
+             NSAttributedString.Key.paragraphStyle: paragraphStyle ]
   }
 }
 
 extension DiagramStyle {
   func alignmentForDirection(direction: Direction) -> Alignment {
-    if direction == .Forward {
+    if direction == .forward {
       return forwardAlignment
     } else {
       return backwardAlignment
@@ -269,7 +269,7 @@ extension DiagramStyle {
 
   /* This keeps lines with an odd width sharp. */
   var oddLineAdjust: CGFloat {
-    return ceil(trackLineWidth) % 2 == 0 ? 0 : -0.5
+    return Int(ceil(trackLineWidth)) % 2 == 0 ? 0 : -0.5
   }
 
   /* For drawing curves in a Parallel and Loop. */
@@ -277,7 +277,7 @@ extension DiagramStyle {
     return floor(horizontalSpacing / 2)
   }
 
-  func pathForArrowHead() -> CGPathRef {
+  func pathForArrowHead() -> CGPath {
     let x1 = CGFloat(0)
     let x2 = self.arrowSize
 
@@ -285,12 +285,12 @@ extension DiagramStyle {
     let y2 = CGFloat(0)
     let y3 = self.arrowSize / 2
 
-    let path = CGPathCreateMutable()
-    CGPathMoveToPoint(path, nil, x1, y1)
-    CGPathAddLineToPoint(path, nil, x2, y2)
-    CGPathAddLineToPoint(path, nil, x1, y3)
-    CGPathAddLineToPoint(path, nil, x1, y1)
-    CGPathCloseSubpath(path)
+    let path = CGMutablePath()
+    path.move(to: CGPoint(x: x1, y: y1))
+    path.addLine(to: CGPoint(x: x2, y: y2))
+    path.addLine(to: CGPoint(x: x1, y: y3))
+    path.addLine(to: CGPoint(x: x1, y: y1))
+    path.closeSubpath()
     return path
   }
 }
@@ -298,13 +298,13 @@ extension DiagramStyle {
 // MARK: - Drawing helper functions
 
 /* This allows us to use NSString drawing in our own CGContextRef. */
-func setUpNSStringDrawingContext(context: CGContextRef) {
+func setUpNSStringDrawingContext(context: CGContext) {
   #if os(iOS)
     UIGraphicsPushContext(context)
   #else
     NSGraphicsContext.saveGraphicsState()
-    let nscg = NSGraphicsContext(CGContext: context, flipped: true)
-    NSGraphicsContext.setCurrentContext(nscg)
+  let nscg = NSGraphicsContext(cgContext: context, flipped: true)
+  NSGraphicsContext.current = nscg
   #endif
 }
 
@@ -316,50 +316,50 @@ func tearDownNSStringDrawingContext() {
   #endif
 }
 
-func fillRect(context: CGContextRef, _ rect: CGRect, _ color: Color) {
-  CGContextSetFillColorWithColor(context, color.CGColor)
-  CGContextFillRect(context, rect)
+func fillRect(_ context: CGContext, _ rect: CGRect, _ color: Color) {
+  context.setFillColor(color.cgColor)
+  context.fill(rect)
 }
 
-func strokeRect(context: CGContextRef, _ rect: CGRect, _ borderSize: CGFloat, _ color: Color) {
-  CGContextSetLineWidth(context, borderSize)
-  CGContextSetStrokeColorWithColor(context, color.CGColor)
-  CGContextStrokeRect(context, CGRectInset(rect, borderSize / 2, borderSize / 2))
+func strokeRect(_ context: CGContext, _ rect: CGRect, _ borderSize: CGFloat, _ color: Color) {
+  context.setLineWidth(borderSize)
+  context.setStrokeColor(color.cgColor)
+  context.stroke(rect.insetBy(dx: borderSize / 2, dy: borderSize / 2))
 }
 
-func drawChildElement(element: Element, _ context: CGContextRef, _ diagramStyle: DiagramStyle, _ direction: Direction) {
-  CGContextSaveGState(context)
-  CGContextTranslateCTM(context, element.x, element.y)
-  element.drawIntoContext(context, diagramStyle: diagramStyle, direction: direction)
-  CGContextRestoreGState(context)
+func drawChildElement(_ element: Element, _ context: CGContext, _ diagramStyle: DiagramStyle, _ direction: Direction) {
+  context.saveGState()
+  context.translateBy(x: element.x, y: element.y)
+  element.drawIntoContext(context: context, diagramStyle: diagramStyle, direction: direction)
+  context.restoreGState()
 }
 
-func drawHorizontalTrack(context: CGContextRef, _ startX: CGFloat, _ endX: CGFloat, _ y: CGFloat, _ diagramStyle: DiagramStyle) {
+func drawHorizontalTrack(_ context: CGContext, _ startX: CGFloat, _ endX: CGFloat, _ y: CGFloat, _ diagramStyle: DiagramStyle) {
   let half = ceil(diagramStyle.trackLineWidth / 2)
   let rect = CGRect(x: startX, y: y - half, width: endX - startX, height: diagramStyle.trackLineWidth)
-  CGContextSetFillColorWithColor(context, diagramStyle.trackColor.CGColor)
-  CGContextFillRect(context, rect)
+  context.setFillColor(diagramStyle.trackColor.cgColor)
+  context.fill(rect)
 }
 
-func drawArrowHead(context: CGContextRef, _ x: CGFloat, _ y: CGFloat, _ diagramStyle: DiagramStyle, _ direction: Direction) {
+func drawArrowHead(_ context: CGContext, _ x: CGFloat, _ y: CGFloat, _ diagramStyle: DiagramStyle, _ direction: Direction) {
   let arrowHead = diagramStyle.pathForArrowHead()
-  CGContextSaveGState(context)
-  CGContextSetFillColorWithColor(context, diagramStyle.trackColor.CGColor)
-  CGContextTranslateCTM(context, x, y + diagramStyle.oddLineAdjust)
-  if direction == .Backward {
-    CGContextTranslateCTM(context, diagramStyle.arrowSize, 0)
-    CGContextScaleCTM(context, -1, 1)
+  context.saveGState()
+  context.setFillColor(diagramStyle.trackColor.cgColor)
+  context.translateBy(x: x, y: y + diagramStyle.oddLineAdjust)
+  if direction == .backward {
+    context.translateBy(x: diagramStyle.arrowSize, y: 0)
+    context.scaleBy(x: -1, y: 1)
   }
-  CGContextAddPath(context, arrowHead)
-  CGContextFillPath(context)
-  CGContextRestoreGState(context)
+  context.addPath(arrowHead)
+  context.fillPath()
+  context.restoreGState()
 }
 
 // MARK: - Elements
 
 enum Direction {
-  case Forward
-  case Backward
+  case forward
+  case backward
 }
 
 /*
@@ -399,7 +399,7 @@ public class Element {
 
   /* Note: Before an element is drawn, the context is translated so that (0,0)
      is the top-left corner of the element. */
-  func drawIntoContext(context: CGContextRef, diagramStyle: DiagramStyle, direction: Direction) {
+  func drawIntoContext(context: CGContext, diagramStyle: DiagramStyle, direction: Direction) {
     // subclass should override
   }
 }
@@ -411,7 +411,7 @@ public final class Box: Element {
   private let text: String
   private let style: BoxStyle
 
-  private var textSize = CGSizeZero
+  private var textSize = CGSize.zero
   private var boxWidth: CGFloat = 0
 
   public init(text: String, style: BoxStyle = BoxStyle()) {
@@ -421,12 +421,12 @@ public final class Box: Element {
 
   override func measure(diagramStyle: DiagramStyle) {
     let textPadding = style.textStyle.padding
-    textSize = text.sizeWithAttributes(style.textStyle.attribs())
+    textSize = text.size(withAttributes: style.textStyle.attribs())
     boxWidth = ceil(textSize.width) + textPadding.left + textPadding.right
     height = ceil(textSize.height) + textPadding.top + textPadding.bottom
 
     switch style.shape {
-    case .RoundedSides:
+    case .roundedSides:
       boxWidth = max(boxWidth, height)
     default:
       break
@@ -436,19 +436,19 @@ public final class Box: Element {
     connectY = floor(height / 2)
   }
 
-  override func drawIntoContext(context: CGContextRef, diagramStyle: DiagramStyle, direction: Direction) {
+  override func drawIntoContext(context: CGContext, diagramStyle: DiagramStyle, direction: Direction) {
     debugRect(context, 0, 0, width, height, 2)
 
     // Adjust position or width based on the alignment settings.
     var boxX = diagramStyle.lefthandTrackLength
-    switch diagramStyle.alignmentForDirection(direction) {
-    case .Left:
+    switch diagramStyle.alignmentForDirection(direction: direction) {
+    case .left:
       break
-    case .Center:
+    case .center:
       boxX += floor((width - diagramStyle.lefthandTrackLength - diagramStyle.righthandTrackLength - boxWidth)/2)
-    case .Right:
+    case .right:
       boxX = width - boxWidth - diagramStyle.righthandTrackLength
-    case .Fill:
+    case .fill:
       boxWidth = width - diagramStyle.lefthandTrackLength - diagramStyle.righthandTrackLength
     }
 
@@ -456,7 +456,7 @@ public final class Box: Element {
     // under the box, which looks better (but only if not drawing arrowheads).
     var under = CGFloat(0)
     switch style.shape {
-    case .PointySides:
+    case .pointySides:
       under = boxWidth/2
     default:
       break
@@ -464,7 +464,7 @@ public final class Box: Element {
 
     // Draw the incoming track.
     var lineX = boxX
-    if diagramStyle.arrowHeads && direction == .Forward {
+    if diagramStyle.arrowHeads && direction == .forward {
       lineX -= diagramStyle.arrowSize
     } else {
       lineX += under
@@ -474,7 +474,7 @@ public final class Box: Element {
 
     // Draw the outgoing track.
     lineX = boxX + boxWidth
-    if diagramStyle.arrowHeads && direction == .Backward {
+    if diagramStyle.arrowHeads && direction == .backward {
       lineX += diagramStyle.arrowSize
     } else {
       lineX -= under
@@ -484,22 +484,22 @@ public final class Box: Element {
 
     // Draw the arrow head.
     if diagramStyle.arrowHeads {
-      let arrowX = (direction == .Backward) ? boxX + boxWidth : boxX - diagramStyle.arrowSize
+      let arrowX = (direction == .backward) ? boxX + boxWidth : boxX - diagramStyle.arrowSize
       drawArrowHead(context, arrowX, connectY, diagramStyle, direction)
     }
 
     // Draw the box shape.
     if style.shape.hasPath() {
-      CGContextSetFillColorWithColor(context, style.backgroundColor.CGColor)
-      CGContextSetStrokeColorWithColor(context, style.borderColor.CGColor)
+      context.setFillColor(style.backgroundColor.cgColor)
+      context.setStrokeColor(style.borderColor.cgColor)
 
       let halfBorder = style.borderSize / 2
-      let boxRect = CGRectMake(boxX + halfBorder, halfBorder, boxWidth - style.borderSize, height - style.borderSize)
-      CGContextSetLineWidth(context, style.borderSize)
+      let boxRect = CGRect(x: boxX + halfBorder, y: halfBorder, width: boxWidth - style.borderSize, height: height - style.borderSize)
+      context.setLineWidth(style.borderSize)
 
-      let path = style.shape.pathForRect(boxRect)
-      CGContextAddPath(context, path)
-      CGContextDrawPath(context, CGPathDrawingMode.FillStroke)
+      let path = style.shape.pathForRect(rect: boxRect)
+      context.addPath(path)
+      context.drawPath(using: .fillStroke)
     }
 
     // Draw the text.
@@ -511,7 +511,7 @@ public final class Box: Element {
 
     debugRect(context, textRect.origin.x, textRect.origin.y, textRect.size.width, textRect.size.height, 4)
 
-    text.drawInRect(textRect, withAttributes: style.textStyle.attribs())
+    text.draw(in: textRect, withAttributes: style.textStyle.attribs())
   }
 }
 
@@ -529,13 +529,13 @@ public final class Series: Element {
     self.elements = elements
   }
 
-  public func add(element: Element) {
+  public func add(_ element: Element) {
     elements.append(element)
   }
 
   override func measure(diagramStyle: DiagramStyle) {
     for element in elements {
-      element.measure(diagramStyle)
+      element.measure(diagramStyle: diagramStyle)
       width += element.width
       connectY = max(element.connectY, connectY)
     }
@@ -555,7 +555,7 @@ public final class Series: Element {
     for element in elements {
       element.x = localX
       element.y = connectY - element.connectY
-      element.layout(diagramStyle, direction: direction)
+      element.layout(diagramStyle: diagramStyle, direction: direction)
       localX += element.width
     }
 
@@ -564,15 +564,15 @@ public final class Series: Element {
     // according to the alignment rules.
     let diff = width - localX
     if diff > 0 {
-      switch diagramStyle.alignmentForDirection(direction) {
-      case .Left:
+      switch diagramStyle.alignmentForDirection(direction: direction) {
+      case .left:
         elements.last!.width += diff
-      case .Right:
+      case .right:
         elements.first!.width += diff
         for element in elements.dropFirst() {
           element.x += diff
         }
-      case .Center, .Fill:
+      case .center, .fill:
         let diffPerElement = floor(diff / CGFloat(elements.count))
         var addX = CGFloat(0)
         for element in elements {
@@ -586,7 +586,7 @@ public final class Series: Element {
     }
   }
 
-  override func drawIntoContext(context: CGContextRef, diagramStyle: DiagramStyle, direction: Direction) {
+  override func drawIntoContext(context: CGContext, diagramStyle: DiagramStyle, direction: Direction) {
     debugRect(context, 0, 0, width, height, 0)
 
     for element in elements {
@@ -613,14 +613,14 @@ public final class Parallel: Element {
     self.elements = elements
   }
 
-  public func add(element: Element) {
+  public func add(_ element: Element) {
     elements.append(element)
   }
 
   override func measure(diagramStyle: DiagramStyle) {
     if elements.count > 0 {
-      for (index, element) in elements.enumerate() {
-        element.measure(diagramStyle)
+      for (index, element) in elements.enumerated() {
+        element.measure(diagramStyle: diagramStyle)
         width = max(width, element.width)
         height += element.height + diagramStyle.verticalSpacing
         if index < indexOfCenterElement {
@@ -641,89 +641,89 @@ public final class Parallel: Element {
       element.x = floor(diagramStyle.horizontalSpacing * 1.5)
       element.y = localY
       element.width = width - diagramStyle.horizontalSpacing * 3
-      element.layout(diagramStyle, direction: direction)
+      element.layout(diagramStyle: diagramStyle, direction: direction)
       localY += element.height + diagramStyle.verticalSpacing
     }
   }
 
-  override func drawIntoContext(context: CGContextRef, diagramStyle: DiagramStyle, direction: Direction) {
+  override func drawIntoContext(context: CGContext, diagramStyle: DiagramStyle, direction: Direction) {
     debugRect(context, 0, 0, width, height, 1)
 
     let radius = diagramStyle.radius
     let margin = radius
 
-    CGContextSaveGState(context)
-    CGContextTranslateCTM(context, diagramStyle.oddLineAdjust, diagramStyle.oddLineAdjust)
+    context.saveGState()
+    context.translateBy(x: diagramStyle.oddLineAdjust, y: diagramStyle.oddLineAdjust)
 
-    CGContextSetStrokeColorWithColor(context, diagramStyle.trackColor.CGColor)
-    CGContextSetLineWidth(context, diagramStyle.trackLineWidth)
+    context.setStrokeColor(diagramStyle.trackColor.cgColor)
+    context.setLineWidth(diagramStyle.trackLineWidth)
 
     // Draw the vertical track going up from the center line.
     if indexOfCenterElement > 0 {
       let lineY = elements.first!.y + elements.first!.connectY + radius
 
-      CGContextMoveToPoint(context, margin, connectY)
-      CGContextAddArc(context, margin, connectY - radius, radius, π/2, 0, 1)
-      CGContextAddLineToPoint(context, radius + margin, lineY)
-      CGContextStrokePath(context)
+      context.move(to: CGPoint(x: margin, y: connectY))
+      context.addArc(center: CGPoint(x: margin, y: connectY - radius), radius: radius, startAngle: π/2, endAngle: 0, clockwise: true)
+      context.addLine(to: CGPoint(x: radius + margin, y: lineY))
+      context.strokePath()
 
-      CGContextMoveToPoint(context, width - margin, connectY)
-      CGContextAddArc(context, width - margin, connectY - radius, radius, π/2, π, 0)
-      CGContextAddLineToPoint(context, width - radius - margin, lineY)
-      CGContextStrokePath(context)
+      context.move(to: CGPoint(x: width - margin, y: connectY))
+      context.addArc(center: CGPoint(x: width - margin, y: connectY - radius), radius: radius, startAngle: π/2, endAngle: π, clockwise: false)
+      context.addLine(to: CGPoint(x: width - radius - margin, y: lineY))
+      context.strokePath()
     }
 
     // Draw the vertical track going down from the center line.
     if indexOfCenterElement < elements.count - 1 {
       let lineY = elements.last!.y + elements.last!.connectY - radius
 
-      CGContextSetLineWidth(context, diagramStyle.trackLineWidth)
+      context.setLineWidth(diagramStyle.trackLineWidth)
 
-      CGContextMoveToPoint(context, margin, connectY)
-      CGContextAddArc(context, margin, connectY + radius, radius, -π/2, 0, 0)
-      CGContextAddLineToPoint(context, radius + margin, lineY)
-      CGContextStrokePath(context)
+      context.move(to: CGPoint(x: margin, y: connectY))
+      context.addArc(center: CGPoint(x: margin, y: connectY + radius), radius: radius, startAngle: -π/2, endAngle: 0, clockwise: false)
+      context.addLine(to: CGPoint(x: radius + margin, y: lineY))
+      context.strokePath()
 
-      CGContextMoveToPoint(context, width - margin, connectY)
-      CGContextAddArc(context, width - margin, connectY + radius, radius, -π/2, -π, 1)
-      CGContextAddLineToPoint(context, width - radius - margin, lineY)
-      CGContextStrokePath(context)
+      context.move(to: CGPoint(x: width - margin, y: connectY))
+      context.addArc(center: CGPoint(x: width - margin, y: connectY + radius), radius: radius, startAngle: -π/2, endAngle: -π, clockwise: true)
+      context.addLine(to: CGPoint(x: width - radius - margin, y: lineY))
+      context.strokePath()
     }
 
     // Draw the curly bits connecting the child elements to the vertical tracks.
-    for (index, element) in elements.enumerate() {
+    for (index, element) in elements.enumerated() {
       let lineY = element.y + element.connectY
 
       if index < indexOfCenterElement {
-        CGContextMoveToPoint(context, element.x, lineY)
-        CGContextAddArc(context, element.x, lineY + radius, radius, -π/2, π, 1)
-        CGContextStrokePath(context)
+        context.move(to: CGPoint(x: element.x, y: lineY))
+        context.addArc(center: CGPoint(x: element.x, y: lineY + radius), radius: radius, startAngle: -π/2, endAngle: π, clockwise: true)
+        context.strokePath()
 
-        CGContextMoveToPoint(context, element.x + element.width, lineY)
-        CGContextAddArc(context, element.x + element.width, lineY + radius, radius, -π/2, 0, 0)
-        CGContextStrokePath(context)
+        context.move(to: CGPoint(x: element.x + element.width, y: lineY))
+        context.addArc(center: CGPoint(x: element.x + element.width, y: lineY + radius), radius: radius, startAngle: -π/2, endAngle: 0, clockwise: false)
+        context.strokePath()
 
       } else if index > indexOfCenterElement {
-        CGContextMoveToPoint(context, radius + margin, lineY - radius)
-        CGContextAddArc(context, element.x, lineY - radius, radius, π, π/2, 1)
-        CGContextStrokePath(context)
+        context.move(to: CGPoint(x: radius + margin, y: lineY - radius))
+        context.addArc(center: CGPoint(x: element.x, y: lineY - radius), radius: radius, startAngle: π, endAngle: π/2, clockwise: true)
+        context.strokePath()
 
-        CGContextMoveToPoint(context, element.x + element.width, lineY)
-        CGContextAddArc(context, element.x + element.width, lineY - radius, radius, π/2, 0, 1)
-        CGContextStrokePath(context)
+        context.move(to: CGPoint(x: element.x + element.width, y: lineY))
+        context.addArc(center: CGPoint(x: element.x + element.width, y: lineY - radius), radius: radius, startAngle: π/2, endAngle: 0, clockwise: true)
+        context.strokePath()
 
       } else {
-        CGContextMoveToPoint(context, 0, lineY)
-        CGContextAddLineToPoint(context, element.x, lineY)
-        CGContextStrokePath(context)
+        context.move(to: CGPoint(x: 0, y: lineY))
+        context.addLine(to: CGPoint(x: element.x, y: lineY))
+        context.strokePath()
 
-        CGContextMoveToPoint(context, element.x + element.width, lineY)
-        CGContextAddLineToPoint(context, width, lineY)
-        CGContextStrokePath(context)
+        context.move(to: CGPoint(x: element.x + element.width, y: lineY))
+        context.addLine(to: CGPoint(x: width, y: lineY))
+        context.strokePath()
       }
     }
 
-    CGContextRestoreGState(context)
+    context.restoreGState()
 
     // Draw the child elements last so they go on top of everything.
     for element in elements {
@@ -746,13 +746,13 @@ public final class Loop: Element {
   }
 
   override func measure(diagramStyle: DiagramStyle) {
-    forward.measure(diagramStyle)
+    forward.measure(diagramStyle: diagramStyle)
     width = max(width, forward.width)
     height += forward.height + diagramStyle.verticalSpacing
 
     connectY = forward.connectY
 
-    backward.measure(diagramStyle)
+    backward.measure(diagramStyle: diagramStyle)
     width = max(width, backward.width)
     height += backward.height
 
@@ -763,15 +763,15 @@ public final class Loop: Element {
     forward.x = diagramStyle.horizontalSpacing
     forward.y = 0
     forward.width = width - diagramStyle.horizontalSpacing*2
-    forward.layout(diagramStyle, direction: .Forward)
+    forward.layout(diagramStyle: diagramStyle, direction: .forward)
 
     backward.x = forward.x
     backward.y = forward.height + diagramStyle.verticalSpacing
     backward.width = forward.width
-    backward.layout(diagramStyle, direction: .Backward)
+    backward.layout(diagramStyle: diagramStyle, direction: .backward)
   }
 
-  override func drawIntoContext(context: CGContextRef, diagramStyle: DiagramStyle, direction: Direction) {
+  override func drawIntoContext(context: CGContext, diagramStyle: DiagramStyle, direction: Direction) {
     debugRect(context, 0, 0, width, height, 3)
 
     let radius = diagramStyle.radius
@@ -781,26 +781,26 @@ public final class Loop: Element {
     drawHorizontalTrack(context, 0, forward.x, forward.y + forward.connectY, diagramStyle)
     drawHorizontalTrack(context, forward.x + forward.width, width, forward.y + forward.connectY, diagramStyle)
 
-    CGContextSaveGState(context)
-    CGContextTranslateCTM(context, diagramStyle.oddLineAdjust, diagramStyle.oddLineAdjust)
+    context.saveGState()
+    context.translateBy(x: diagramStyle.oddLineAdjust, y: diagramStyle.oddLineAdjust)
 
-    CGContextSetStrokeColorWithColor(context, diagramStyle.trackColor.CGColor)
-    CGContextSetLineWidth(context, diagramStyle.trackLineWidth)
+    context.setStrokeColor(diagramStyle.trackColor.cgColor)
+    context.setLineWidth(diagramStyle.trackLineWidth)
 
-    CGContextMoveToPoint(context, forward.x, lineY1)
-    CGContextAddArc(context, forward.x, lineY1 + radius, radius, -π/2, -π, 1)
-    CGContextAddArc(context, backward.x, lineY2 - radius, radius, π, π/2, 1)
-    CGContextStrokePath(context)
+    context.move(to: CGPoint(x: forward.x, y: lineY1))
+    context.addArc(center: CGPoint(x: forward.x, y: lineY1 + radius), radius: radius, startAngle: -π/2, endAngle: -π, clockwise: true)
+    context.addArc(center: CGPoint(x: backward.x, y: lineY2 - radius), radius: radius, startAngle: π, endAngle: π/2, clockwise: true)
+    context.strokePath()
 
-    CGContextMoveToPoint(context, forward.x + forward.width, lineY1)
-    CGContextAddArc(context, forward.x + forward.width, lineY1 + radius, radius, -π/2, 0, 0)
-    CGContextAddArc(context, backward.x + backward.width, lineY2 - radius, radius, 0, π/2, 0)
-    CGContextStrokePath(context)
+    context.move(to: CGPoint(x: forward.x + forward.width, y: lineY1))
+    context.addArc(center: CGPoint(x: forward.x + forward.width, y: lineY1 + radius), radius: radius, startAngle: -π/2, endAngle: 0, clockwise: false)
+    context.addArc(center: CGPoint(x: backward.x + backward.width, y: lineY2 - radius), radius: radius, startAngle: 0, endAngle: π/2, clockwise: false)
+    context.strokePath()
 
-    CGContextRestoreGState(context)
+    context.restoreGState()
 
-    drawChildElement(forward, context, diagramStyle, .Forward)
-    drawChildElement(backward, context, diagramStyle, .Backward)
+    drawChildElement(forward, context, diagramStyle, .forward)
+    drawChildElement(backward, context, diagramStyle, .backward)
   }
 }
 
@@ -816,7 +816,7 @@ public final class Skip: Element {
     connectY = floor(height / 2)
   }
 
-  override func drawIntoContext(context: CGContextRef, diagramStyle: DiagramStyle, direction: Direction) {
+  override func drawIntoContext(context: CGContext, diagramStyle: DiagramStyle, direction: Direction) {
     debugRect(context, 0, 0, width, height, 4)
 
     let lineY = floor(height/2)
@@ -836,7 +836,7 @@ public final class Decoration: Element {
   private let text: String
   private let style: DecorationStyle
 
-  private var textSize = CGSizeZero
+  private var textSize = CGSize.zero
 
   public init(element: Element, text: String = "", style: DecorationStyle = DecorationStyle()) {
     self.element = element
@@ -848,14 +848,14 @@ public final class Decoration: Element {
     if text == "" {
       textSize = CGSize.zero
     } else {
-      textSize = text.sizeWithAttributes(style.textStyle.attribs())
+      textSize = text.size(withAttributes: style.textStyle.attribs())
     }
 
     let textPadding = style.textStyle.padding
     width = ceil(textSize.width) + textPadding.left + textPadding.right
     height = ceil(textSize.height) + textPadding.top + textPadding.bottom
 
-    element.measure(diagramStyle)
+    element.measure(diagramStyle: diagramStyle)
     width = max(element.width, width)
     height = max(element.height, height)
 
@@ -868,11 +868,11 @@ public final class Decoration: Element {
   override func layout(diagramStyle: DiagramStyle, direction: Direction) {
     element.x = style.margin.left + style.padding.left
     element.y = style.margin.top + style.padding.top
-    element.layout(diagramStyle, direction: direction)
+    element.layout(diagramStyle: diagramStyle, direction: direction)
   }
 
-  override func drawIntoContext(context: CGContextRef, diagramStyle: DiagramStyle, direction: Direction) {
-    let rect = CGRectMake(style.margin.left, style.margin.top, width - style.margin.left - style.margin.right, height - style.margin.top - style.margin.bottom)
+  override func drawIntoContext(context: CGContext, diagramStyle: DiagramStyle, direction: Direction) {
+    let rect = CGRect(x: style.margin.left, y: style.margin.top, width: width - style.margin.left - style.margin.right, height: height - style.margin.top - style.margin.bottom)
 
     fillRect(context, rect, style.backgroundColor)
     strokeRect(context, rect, style.borderSize, style.borderColor)
@@ -886,7 +886,7 @@ public final class Decoration: Element {
         width: textSize.width,
         height: textSize.height)
 
-      text.drawInRect(textRect, withAttributes: style.textStyle.attribs())
+      text.draw(in: textRect, withAttributes: style.textStyle.attribs())
     }
 
     let lineY = element.y + element.connectY
@@ -914,22 +914,22 @@ extension Diagram {
   public func renderImage(element: Element, scale: CGFloat) -> Image {
     let capSize = style.arrowSize
 
-    element.measure(style)
+    element.measure(diagramStyle: style)
     element.x = style.margin.left + capSize + style.horizontalSpacing
     element.y = style.margin.top
-    element.layout(style, direction: .Forward)
+    element.layout(diagramStyle: style, direction: .forward)
 
     let width = element.width + capSize*2 + style.horizontalSpacing*2 + style.margin.left + style.margin.right
     let height = element.height + style.margin.top + style.margin.bottom
     assert(width > 0)
     assert(height > 0)
 
-    let context = createContextWithWidth(width, height: height, scale: scale)
+    let context = createContextWithWidth(width: width, height: height, scale: scale)
 
-    setUpNSStringDrawingContext(context)
-    CGContextSetLineCap(context, CGLineCap.Square)
+    setUpNSStringDrawingContext(context: context)
+    context.setLineCap(CGLineCap.square)
 
-    drawChildElement(element, context, style, .Forward)
+    drawChildElement(element, context, style, .forward)
 
     let lineY = element.y + element.connectY
     let capY = lineY - ceil(capSize / 2)
@@ -939,66 +939,66 @@ extension Diagram {
     drawHorizontalTrack(context, capX1 + capSize, element.x, lineY, style)
     drawHorizontalTrack(context, element.x + element.width, capX2, lineY, style)
 
-    CGContextSetFillColorWithColor(context, style.trackColor.CGColor)
-    CGContextSetStrokeColorWithColor(context, style.trackColor.CGColor)
-    CGContextSetLineWidth(context, style.trackLineWidth)
+    context.setFillColor(style.trackColor.cgColor)
+    context.setStrokeColor(style.trackColor.cgColor)
+    context.setLineWidth(style.trackLineWidth)
 
     switch style.capStyle {
-    case .FilledCircle:
-      CGContextFillEllipseInRect(context, CGRectMake(capX1, capY, capSize, capSize))
-      CGContextFillEllipseInRect(context, CGRectMake(capX2, capY, capSize, capSize))
+    case .filledCircle:
+      context.fillEllipse(in: CGRect(x: capX1, y: capY, width: capSize, height: capSize))
+      context.fillEllipse(in: CGRect(x: capX2, y: capY, width: capSize, height: capSize))
 
-    case .StrokedCircle:
-      CGContextStrokeEllipseInRect(context, CGRectMake(capX1, capY, capSize, capSize))
-      CGContextStrokeEllipseInRect(context, CGRectMake(capX2, capY, capSize, capSize))
+    case .strokedCircle:
+      context.strokeEllipse(in: CGRect(x: capX1, y: capY, width: capSize, height: capSize))
+      context.strokeEllipse(in: CGRect(x: capX2, y: capY, width: capSize, height: capSize))
 
-    case .VerticalBars:
-      CGContextMoveToPoint(context, capX1, lineY - capSize)
-      CGContextAddLineToPoint(context, capX1, lineY + capSize)
-      CGContextStrokePath(context)
+    case .verticalBars:
+      context.move(to: CGPoint(x: capX1, y: lineY - capSize))
+      context.addLine(to: CGPoint(x: capX1, y: lineY + capSize))
+      context.strokePath()
 
-      CGContextMoveToPoint(context, capX1 + capSize, lineY - capSize)
-      CGContextAddLineToPoint(context, capX1 + capSize, lineY + capSize)
-      CGContextStrokePath(context)
+      context.move(to: CGPoint(x: capX1 + capSize, y: lineY - capSize))
+      context.addLine(to: CGPoint(x: capX1 + capSize, y: lineY + capSize))
+      context.strokePath()
 
-      CGContextMoveToPoint(context, capX2, lineY - capSize)
-      CGContextAddLineToPoint(context, capX2, lineY + capSize)
-      CGContextStrokePath(context)
+      context.move(to: CGPoint(x: capX2, y: lineY - capSize))
+      context.addLine(to: CGPoint(x: capX2, y: lineY + capSize))
+      context.strokePath()
 
-      CGContextMoveToPoint(context, capX2 + capSize, lineY - capSize)
-      CGContextAddLineToPoint(context, capX2 + capSize, lineY + capSize)
-      CGContextStrokePath(context)
+      context.move(to: CGPoint(x: capX2 + capSize, y: lineY - capSize))
+      context.addLine(to: CGPoint(x: capX2 + capSize, y: lineY + capSize))
+      context.strokePath()
     }
 
     tearDownNSStringDrawingContext()
 
-    return imageFromContext(context, scale: scale)
+    return imageFromContext(context: context, scale: scale)
   }
 
-  private func createContextWithWidth(width: CGFloat, height: CGFloat, scale: CGFloat) -> CGContextRef {
+  private func createContextWithWidth(width: CGFloat, height: CGFloat, scale: CGFloat) -> CGContext {
     let contextWidth = Int(width * scale)
     let contextHeight = Int(height * scale)
 
     let colorSpace = CGColorSpaceCreateDeviceRGB()
-    let bitmapInfo = CGImageAlphaInfo.PremultipliedLast.rawValue
-    let context = CGBitmapContextCreate(nil, contextWidth, contextHeight, 8, 0, colorSpace, bitmapInfo)
+    let bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue
+    let context = CGContext(data: nil, width: contextWidth, height: contextHeight, bitsPerComponent: 8, bytesPerRow: 0, space: colorSpace, bitmapInfo: bitmapInfo)!
 
     // Scale the context and flip it vertically so (0,0) is at top-left.
-    CGContextScaleCTM(context, CGFloat(scale), CGFloat(-scale))
-    CGContextTranslateCTM(context, 0, CGFloat(-height))
+    context.scaleBy(x: CGFloat(scale), y: CGFloat(-scale))
+    context.translateBy(x: 0, y: CGFloat(-height))
 
-    CGContextSetFillColorWithColor(context, style.backgroundColor.CGColor)
-    CGContextFillRect(context, CGRectMake(0, 0, width, height))
+    context.setFillColor(style.backgroundColor.cgColor)
+    context.fill(CGRect(x: 0, y: 0, width: width, height: height))
 
-    return context!
+    return context
   }
 
-  private func imageFromContext(context: CGContextRef, scale: CGFloat) -> Image {
-    let cgImage = CGBitmapContextCreateImage(context)!
+  private func imageFromContext(context: CGContext, scale: CGFloat) -> Image {
+    let cgImage = context.makeImage()!
     #if os(iOS)
-    return UIImage(CGImage: cgImage, scale: scale, orientation: .Up)
+    return UIImage(cgImage: cgImage, scale: scale, orientation: .up)
     #else
-    return NSImage(CGImage: cgImage, size: NSZeroSize)
+    return NSImage(cgImage: cgImage, size: NSZeroSize)
     #endif
   }
 }
@@ -1014,7 +1014,7 @@ public final class BoxFactory {
     self.defaultBoxStyle = style
   }
 
-  public func createBox(text: String) -> Box {
+  public func createBox(_ text: String) -> Box {
     return Box(text: text, style: defaultBoxStyle)
   }
 }
@@ -1025,34 +1025,34 @@ public final class BoxFactory {
 
 private let textStyle: TextStyle = {
   var textStyle = TextStyle()
-  textStyle.font = Font.systemFontOfSize(14)
+  textStyle.font = Font.systemFont(ofSize: 14)
   textStyle.padding = EdgeInsets(top: 4, left: 6, bottom: 6, right: 4)
   return textStyle
 }()
 
 private let terminalStyle: BoxStyle = {
   var style = BoxStyle()
-  style.shape = .RoundedSides
+  style.shape = .roundedSides
   style.textStyle = textStyle
   return style
 }()
 
 private let nonTerminalStyle: BoxStyle = {
   var style = BoxStyle()
-  style.shape = .Rectangle
+  style.shape = .rectangle
   style.textStyle = textStyle
   return style
 }()
 
 private let commentStyle: BoxStyle = {
   var style = BoxStyle()
-  style.shape = .None
+  style.shape = .none
 
   #if os(iOS)
-  style.textStyle.font = UIFont.italicSystemFontOfSize(12)
+  style.textStyle.font = UIFont.italicSystemFont(ofSize: 12)
   #else
-  let systemFont = NSFont.systemFontOfSize(12)
-  style.textStyle.font = NSFontManager.sharedFontManager().convertFont(systemFont, toHaveTrait: .ItalicFontMask)
+  let systemFont = NSFont.systemFont(ofSize: 12)
+  style.textStyle.font = NSFontManager.shared.convert(systemFont, toHaveTrait: .italicFontMask)
   #endif
 
   return style
@@ -1060,7 +1060,7 @@ private let commentStyle: BoxStyle = {
 
 private let specialStyle: BoxStyle = {
   var style = BoxStyle()
-  style.shape = .PointySides(angle: 30)
+  style.shape = .pointySides(angle: 30)
   style.textStyle = textStyle
   style.textStyle.padding.left = 10
   style.textStyle.padding.right = 10
@@ -1071,43 +1071,43 @@ private let captureStyle: DecorationStyle = {
   var style = DecorationStyle()
   style.margin = EdgeInsets(top: 0, left: 2, bottom: 0, right: 2)
   style.padding = EdgeInsets(top: 6, left: 2, bottom: 6, right: 2)
-  style.textStyle.font = Font.boldSystemFontOfSize(10)
+  style.textStyle.font = Font.boldSystemFont(ofSize: 10)
   style.textStyle.padding = EdgeInsets(top: 0, left: 0, bottom: 3, right: 5)
   return style
 }()
 
 /* A box with rounded sides. */
-public func terminal(text: String) -> Element {
+public func terminal(_ text: String) -> Element {
   return Box(text: text, style: terminalStyle)
 }
 
 /* A box with straight sides. */
-public func nonTerminal(text: String) -> Element {
+public func nonTerminal(_ text: String) -> Element {
   return Box(text: text, style: nonTerminalStyle)
 }
 
 /* Text with no box around it; you use this inside repeats. */
-public func comment(text: String) -> Element {
+public func comment(_ text: String) -> Element {
   return Box(text: text, style: commentStyle)
 }
 
 /* For things like \s, \w, and so on. */
-public func characterClass(text: String) -> Element {
+public func characterClass(_ text: String) -> Element {
   return nonTerminal(text)
 }
 
 /* For literal text strings inside the regexp. */
-public func literal(text: String) -> Element {
+public func literal(_ text: String) -> Element {
   return terminal(text)
 }
 
 /* For start-of-line, etc. */
-public func special(text: String) -> Element {
+public func special(_ text: String) -> Element {
   return Box(text: text, style: specialStyle)
 }
 
 /* Concatenation of two or more elements. */
-public func sequence(elements: Element...) -> Element {
+public func sequence(_ elements: Element...) -> Element {
   return Series(elements: elements)
 }
 
@@ -1117,7 +1117,7 @@ public func sequence(elements: Element...) -> Element {
  * The drawSkipBelow parameter determines whether the skip line is drawn above
  * or below the element; the element itself is always in the center line.
  */
-public func optional(element: Element, _ drawSkipBelow: Bool = false) -> Element {
+public func optional(_ element: Element, _ drawSkipBelow: Bool = false) -> Element {
   let p = Parallel()
   if drawSkipBelow {
     p.add(element)
@@ -1131,7 +1131,7 @@ public func optional(element: Element, _ drawSkipBelow: Bool = false) -> Element
 }
 
 /* | in the regex */
-public func choice(elements: Element...) -> Element {
+public func choice(_ elements: Element...) -> Element {
   return Parallel(elements: elements)
 }
 
@@ -1141,7 +1141,7 @@ public func choice(elements: Element...) -> Element {
  * The centerIndex parameter determines which element is drawn on the center
  * line.
  */
-public func choice(centerIndex: Int, _ elements: Element...) -> Element {
+public func choice(_ centerIndex: Int, _ elements: Element...) -> Element {
   let p = Parallel(elements: elements)
   p.indexOfCenterElement = centerIndex
   return p
@@ -1152,56 +1152,56 @@ public func skip() -> Element {
 }
 
 /* + in the regex */
-public func oneOrMore(element: Element, _ loop: Element = skip()) -> Element {
+public func oneOrMore(_ element: Element, _ loop: Element = skip()) -> Element {
   return Loop(forward: element, backward: loop)
 }
 
 /* * in the regex */
-public func zeroOrMore(element: Element, _ loop: Element = skip(), _ drawSkipBelow: Bool = false) -> Element {
+public func zeroOrMore(_ element: Element, _ loop: Element = skip(), _ drawSkipBelow: Bool = false) -> Element {
   return optional(oneOrMore(element, loop), drawSkipBelow)
 }
 
 /* A capture group in the regex. */
-public func capture(element: Element, _ text: String) -> Element {
+public func capture(_ element: Element, _ text: String) -> Element {
   return Decoration(element: element, text: text, style: captureStyle)
 }
 
 /* Draws a railroad diagram as a UIImage. */
-public func diagram(elements: Element...) -> Image {
+public func diagram(_ elements: Element...) -> Image {
   var diagramStyle = DiagramStyle()
-  diagramStyle.backgroundColor = Color.clearColor()
+  diagramStyle.backgroundColor = Color.clear
   diagramStyle.trackLineWidth = 2
   diagramStyle.horizontalSpacing = 12
   diagramStyle.verticalSpacing = 9
 
   let diagram = Diagram(style: diagramStyle)
   let series = Series(elements: elements)
-  return diagram.renderImage(series, scale: 1)
+  return diagram.renderImage(element: series, scale: 2)
 }
 
 /* Alternative DSL from: https://code.google.com/p/html-railroad-diagram/ */
 
 /* each(a, b, c)  produces (A -> B -> C) */
-public func each(elements: Element...) -> Element {
+public func each(_ elements: Element...) -> Element {
   return Series(elements: elements)
 }
 
 /* Like | in EBNF (choose 1 of) */
-public func or(elements: Element...) -> Element {
+public func or(_ elements: Element...) -> Element {
   return Parallel(elements: elements)
 }
 
 /* Like ? in EBNF (0 or 1 occurences) */
-public func maybe(element: Element) -> Element {
+public func maybe(_ element: Element) -> Element {
   return optional(element)
 }
 
 /* Like + in EBNF (1 or more repetitions) */
-public func many(element: Element, _ loop: Element = Skip()) -> Element {
+public func many(_ element: Element, _ loop: Element = Skip()) -> Element {
   return Loop(forward: element, backward: loop)
 }
 
 /* Like * in EBNF (0 or more repetitions) */
-public func any(element: Element, _ loop: Element = Skip()) -> Element {
+public func any(_ element: Element, _ loop: Element = Skip()) -> Element {
   return maybe(many(element, loop))
 }

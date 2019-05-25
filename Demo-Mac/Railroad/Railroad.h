@@ -1,11 +1,3 @@
-//
-//  Railroad.h
-//  Railroad
-//
-//  Created by Matthijs on 06-04-15.
-//  Copyright (c) 2015 Hollance. All rights reserved.
-//
-
 #import <Cocoa/Cocoa.h>
 
 //! Project version number for Railroad.
